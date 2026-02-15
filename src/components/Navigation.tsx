@@ -18,6 +18,7 @@ import { useTheme } from '@/hooks/useTheme';
 interface NavigationProps {
   currentPage: string;
   onNavigate: (page: string) => void;
+  onSignOut: () => Promise<{ error: any }>;
 }
 
 const navItems = [
@@ -29,13 +30,19 @@ const navItems = [
   { id: 'settings', label: 'Exam Settings', icon: Settings },
 ];
 
-export function Navigation({ currentPage, onNavigate }: NavigationProps) {
+export function Navigation({ currentPage, onNavigate, onSignOut }: NavigationProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { isDark, toggleTheme } = useTheme();
 
   const handleNavigate = (page: string) => {
     onNavigate(page);
     setIsOpen(false);
+  };
+
+  const handleLogout = async () => {
+    setIsOpen(false);
+    await onSignOut();
+    // Redirect happens automatically via auth state listener
   };
 
   return (
@@ -121,8 +128,9 @@ export function Navigation({ currentPage, onNavigate }: NavigationProps) {
                   <span className="font-medium">{isDark ? 'Light Mode' : 'Dark Mode'}</span>
                 </button>
 
-                {/* Logout */}
+                {/* Logout - now functional */}
                 <button
+                  onClick={handleLogout}
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-xl touch-target calm-transition hover:bg-destructive/10 text-destructive focus-calm"
                 >
                   <LogOut className="w-5 h-5" />

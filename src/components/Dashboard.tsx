@@ -2,21 +2,21 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { ExamCountdown } from './ExamCountdown';
 import { StreakBadge } from './StreakBadge';
+import type { Tables } from '@/integrations/supabase/types';
+
+type Profile = Tables<'profiles'>;
 
 interface DashboardProps {
   onNavigate: (page: string) => void;
+  profile: Profile;
 }
 
-export function Dashboard({ onNavigate }: DashboardProps) {
-  // Mock data - would come from Firebase
-  const userData = {
-    name: 'Learner',
-    currentLevel: 'N5',
-    streak: 12,
-    examDate: new Date('2025-07-06'), // JLPT exam date
-    todayProgress: 0,
-    currentLesson: 'Hiragana: は行',
-  };
+export function Dashboard({ onNavigate, profile }: DashboardProps) {
+  // All data comes from the Supabase profile — no hardcoded values
+  const examDate = profile.exam_date ? new Date(profile.exam_date) : null;
+  const currentLevel = profile.current_level;
+  const streak = profile.streak;
+  const displayName = profile.display_name || 'Learner';
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -39,21 +39,23 @@ export function Dashboard({ onNavigate }: DashboardProps) {
           className="space-y-2"
         >
           <h1 className="text-2xl font-light text-foreground">
-            {getGreeting()}.
+            {getGreeting()}, {displayName}.
           </h1>
           <div className="flex items-center gap-3">
             <p className="text-muted-foreground">
-              Continue your <span className="font-medium text-foreground">{userData.currentLevel}</span> journey
+              Continue your <span className="font-medium text-foreground">{currentLevel}</span> journey
             </p>
-            <StreakBadge days={userData.streak} />
+            <StreakBadge days={streak} />
           </div>
         </motion.div>
 
-        {/* Exam Countdown */}
-        <ExamCountdown 
-          examDate={userData.examDate} 
-          level={userData.currentLevel} 
-        />
+        {/* Exam Countdown — only shown if exam date is set */}
+        {examDate && (
+          <ExamCountdown 
+            examDate={examDate} 
+            level={currentLevel} 
+          />
+        )}
 
         {/* Today's Lesson Card - Primary CTA */}
         <motion.button
@@ -72,7 +74,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
               
               <div>
                 <p className="text-lg font-medium text-foreground mb-1">
-                  {userData.currentLesson}
+                  Continue {currentLevel} Practice
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Continue where you left off
@@ -87,22 +89,6 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             >
               <ArrowRight className="w-5 h-5" />
             </motion.div>
-          </div>
-
-          {/* Progress bar */}
-          <div className="mt-6">
-            <div className="flex justify-between text-xs text-muted-foreground mb-2">
-              <span>Today's progress</span>
-              <span>0 / 3 lessons</span>
-            </div>
-            <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${userData.todayProgress}%` }}
-                transition={{ delay: 0.5, duration: 0.8 }}
-                className="h-full bg-primary rounded-full"
-              />
-            </div>
           </div>
         </motion.button>
 

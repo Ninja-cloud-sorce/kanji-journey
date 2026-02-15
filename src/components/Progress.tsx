@@ -1,23 +1,29 @@
 import { motion } from 'framer-motion';
 import { Flame, BookOpen, Headphones, PenTool, MessageSquare, TrendingUp } from 'lucide-react';
+import type { Tables } from '@/integrations/supabase/types';
+
+type Profile = Tables<'profiles'>;
 
 interface ProgressProps {
   onNavigate: (page: string) => void;
+  profile: Profile;
 }
 
 const weekDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-const weekActivity = [true, true, true, false, true, true, false]; // This week's activity
+// TODO: Replace with real activity data from Supabase when activity tracking is added
+const weekActivity = [false, false, false, false, false, false, false];
 
 const skills = [
-  { name: 'Vocabulary', icon: BookOpen, score: 72, color: 'text-primary' },
-  { name: 'Grammar', icon: MessageSquare, score: 58, color: 'text-accent' },
-  { name: 'Listening', icon: Headphones, score: 45, color: 'text-warning' },
-  { name: 'Reading', icon: PenTool, score: 65, color: 'text-success' },
+  { name: 'Vocabulary', icon: BookOpen, score: 0, color: 'text-primary' },
+  { name: 'Grammar', icon: MessageSquare, score: 0, color: 'text-accent' },
+  { name: 'Listening', icon: Headphones, score: 0, color: 'text-warning' },
+  { name: 'Reading', icon: PenTool, score: 0, color: 'text-success' },
 ];
 
-export function Progress({ onNavigate }: ProgressProps) {
-  const streakDays = 12;
-  const readinessScore = 62;
+export function Progress({ onNavigate, profile }: ProgressProps) {
+  // All values from Supabase profile — no hardcoded fallbacks
+  const streakDays = profile.streak;
+  const readinessScore = profile.readiness_score;
 
   return (
     <div className="min-h-screen pt-24 pb-24 px-4">
@@ -51,7 +57,6 @@ export function Progress({ onNavigate }: ProgressProps) {
                 <p className="text-sm text-muted-foreground">day streak</p>
               </div>
             </div>
-            <p className="text-sm text-muted-foreground">Personal best: 18</p>
           </div>
 
           {/* Week View */}
@@ -84,7 +89,7 @@ export function Progress({ onNavigate }: ProgressProps) {
         >
           <div className="flex items-center gap-3 mb-4">
             <TrendingUp className="w-5 h-5 text-primary" />
-            <p className="font-medium text-foreground">N5 Readiness</p>
+            <p className="font-medium text-foreground">{profile.current_level} Readiness</p>
           </div>
           
           <div className="flex items-end gap-4">
@@ -153,13 +158,13 @@ export function Progress({ onNavigate }: ProgressProps) {
         >
           <p className="text-sm font-medium text-foreground mb-2">Focus Areas</p>
           <p className="text-sm text-muted-foreground">
-            Based on recent quizzes, practice more on <span className="text-foreground">particles</span> and <span className="text-foreground">verb conjugation</span>.
+            Practice more to see personalized recommendations here.
           </p>
           <button
             onClick={() => onNavigate('practice')}
             className="mt-3 text-sm text-primary font-medium"
           >
-            Practice weak areas →
+            Start practicing →
           </button>
         </motion.div>
       </motion.div>

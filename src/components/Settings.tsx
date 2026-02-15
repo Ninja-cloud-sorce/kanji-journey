@@ -1,19 +1,45 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Target, Clock, Bell, ChevronRight } from 'lucide-react';
+import { Calendar, Target, Clock, Bell, ChevronRight, Loader2 } from 'lucide-react';
+import type { Tables } from '@/integrations/supabase/types';
+
+type Profile = Tables<'profiles'>;
 
 interface SettingsProps {
   onNavigate: (page: string) => void;
+  profile: Profile;
+  updateProfile: (updates: Partial<Profile>) => Promise<{ error: any }>;
 }
 
-export function Settings({ onNavigate }: SettingsProps) {
-  const [examDate, setExamDate] = useState('2025-07-06');
-  const [targetLevel, setTargetLevel] = useState('N5');
+export function Settings({ onNavigate, profile, updateProfile }: SettingsProps) {
+  // Initialize from Supabase profile data
+  const [examDate, setExamDate] = useState(
+    profile.exam_date ? new Date(profile.exam_date).toISOString().split('T')[0] : ''
+  );
+  const [targetLevel, setTargetLevel] = useState(profile.current_level);
   const [dailyGoal, setDailyGoal] = useState(15);
   const [notifications, setNotifications] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   const levels = ['N5', 'N4', 'N3', 'N2', 'N1'];
   const goalOptions = [10, 15, 20, 30, 45, 60];
+
+  // Save changes to Supabase when user modifies settings
+  const handleSave = async (updates: Partial<Profile>) => {
+    setSaving(true);
+    await updateProfile(updates);
+    setSaving(false);
+  };
+
+  const handleLevelChange = (level: string) => {
+    setTargetLevel(level);
+    handleSave({ current_level: level });
+  };
+
+  const handleExamDateChange = (date: string) => {
+    setExamDate(date);
+    handleSave({ exam_date: date ? new Date(date).toISOString() : null });
+  };
 
   return (
     <div className="min-h-screen pt-24 pb-24 px-4">
@@ -28,6 +54,12 @@ export function Settings({ onNavigate }: SettingsProps) {
         >
           <h1 className="text-2xl font-light text-foreground mb-2">Exam Settings</h1>
           <p className="text-muted-foreground">Customize your JLPT journey</p>
+          {saving && (
+            <div className="flex items-center gap-2 mt-1">
+              <Loader2 className="w-3 h-3 animate-spin text-primary" />
+              <span className="text-xs text-muted-foreground">Saving...</span>
+            </div>
+          )}
         </motion.div>
 
         {/* Target Level */}
@@ -46,7 +78,7 @@ export function Settings({ onNavigate }: SettingsProps) {
             {levels.map((level) => (
               <button
                 key={level}
-                onClick={() => setTargetLevel(level)}
+                onClick={() => handleLevelChange(level)}
                 className={`flex-1 py-3 rounded-xl font-medium text-sm calm-transition focus-calm ${
                   targetLevel === level
                     ? 'bg-primary text-primary-foreground'
@@ -74,7 +106,7 @@ export function Settings({ onNavigate }: SettingsProps) {
           <input
             type="date"
             value={examDate}
-            onChange={(e) => setExamDate(e.target.value)}
+            onChange={(e) => handleExamDateChange(e.target.value)}
             className="w-full px-4 py-3 rounded-xl bg-secondary text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
           />
           
@@ -152,7 +184,7 @@ export function Settings({ onNavigate }: SettingsProps) {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium text-foreground">Learning Path</p>
-              <p className="text-sm text-muted-foreground">JLPT Exam-Oriented</p>
+              <p className="text-sm text-muted-foreground">{profile.learning_path || 'JLPT Exam-Oriented'}</p>
             </div>
             <ChevronRight className="w-5 h-5 text-muted-foreground" />
           </div>

@@ -1,0 +1,12 @@
+[
+  { "id": "h-a", "char": "あ", "romaji": "a", "hint": "Looks like an Apple", "collection_id": "h1" },
+  { "id": "h-i", "char": "い", "romaji": "i", "hint": "Two lines like 'i'", "collection_id": "h1" },
+  { "id": "h-u", "char": "う", "romaji": "u", "hint": "Looks like a side-view of someone saying 'U'", "collection_id": "h1" },
+  { "id": "h-e", "char": "え", "romaji": "e", "hint": "Looks like an Expert", "collection_id": "h1" },
+  { "id": "h-o", "char": "お", "romaji": "o", "hint": "Looks like an Overdose of circles", "collection_id": "h1" },
+  { "id": "h-ka", "char": "か", "romaji": "ka", "hint": "A 'ka-raoke' singer", "collection_id": "h1" },
+  { "id": "h-ki", "char": "き", "romaji": "ki", "hint": "Looks like a Key", "collection_id": "h1" },
+  { "id": "h-ku", "char": "く", "romaji": "ku", "hint": "Cuckoo's beak", "collection_id": "h1" },
+  { "id": "h-ke", "char": "け", "romaji": "ke", "hint": "Looks like a Keg", "collection_id": "h1" },
+  { "id": "h-ko", "char": "こ", "romaji": "ko", "hint": "Two worms 'co-habiting'", "collection_id": "h1" }
+]

@@ -1,0 +1,12 @@
+[
+  { "id": "k-a", "char": "ア", "romaji": "a", "hint": "Looks like an Axe", "collection_id": "k1" },
+  { "id": "k-i", "char": "イ", "romaji": "i", "hint": "Looks like an Eagle", "collection_id": "k1" },
+  { "id": "k-u", "char": "ウ", "romaji": "u", "hint": "U and a tail", "collection_id": "k1" },
+  { "id": "k-e", "char": "エ", "romaji": "e", "hint": "Looks like an Elevator", "collection_id": "k1" },
+  { "id": "k-o", "char": "オ", "romaji": "o", "hint": "An old man reclining", "collection_id": "k1" },
+  { "id": "k-ka", "char": "カ", "romaji": "ka", "hint": "Strong 'K' punch", "collection_id": "k1" },
+  { "id": "k-ki", "char": "キ", "romaji": "ki", "hint": "Sharp Key", "collection_id": "k1" },
+  { "id": "k-ku", "char": "ク", "romaji": "ku", "hint": "Looks like a Cook's hat", "collection_id": "k1" },
+  { "id": "k-ke", "char": "ケ", "romaji": "ke", "hint": "Looks like a K with a 'ke-p'", "collection_id": "k1" },
+  { "id": "k-ko", "char": "コ", "romaji": "ko", "hint": "A corner (ko-rner)", "collection_id": "k1" }
+]

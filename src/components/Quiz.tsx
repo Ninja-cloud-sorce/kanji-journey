@@ -1,199 +1,189 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Check, X, Volume2 } from 'lucide-react';
+import { useState, useMemo, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Check, X, ArrowRight } from "lucide-react";
+import n5Data from "@/data/jlpt_n5.json";
 
-interface QuizProps {
-  onNavigate: (page: string) => void;
+interface Props {
+  onNavigate:  (page: string) => void;
+  onBack:      () => void;
+  togglePulse: () => void;
+  level?:      string;
 }
 
-const sampleQuestions = [
-  {
-    id: 1,
-    type: 'reading',
-    question: 'What is the reading of この漢字?',
-    character: '水',
-    options: ['みず', 'ひ', 'き', 'やま'],
-    correct: 0,
-  },
-  {
-    id: 2,
-    type: 'meaning',
-    question: 'What does this mean?',
-    character: 'おはようございます',
-    options: ['Good night', 'Good morning', 'Thank you', 'Goodbye'],
-    correct: 1,
-  },
-  {
-    id: 3,
-    type: 'grammar',
-    question: 'Fill in the blank: 私___学生です。',
-    character: '私___学生です。',
-    options: ['は', 'を', 'に', 'で'],
-    correct: 0,
-  },
-];
+export function Quiz({ onNavigate, onBack, togglePulse, level = "N5" }: Props) {
+  const questions = useMemo(() => (n5Data as any).jlpt_n5_important_questions.quizzes.slice(0, 10), []);
 
-export function Quiz({ onNavigate }: QuizProps) {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [showResult, setShowResult] = useState(false);
-  const [score, setScore] = useState(0);
+  const [idx,        setIdx]        = useState(0);
+  const [chosen,     setChosen]     = useState<number | null>(null);
+  const [revealed,   setRevealed]   = useState(false);
+  const [score,      setScore]      = useState(0);
+  const [finished,   setFinished]   = useState(false);
+  const [isWrong,    setIsWrong]    = useState(false);
 
-  const question = sampleQuestions[currentQuestion];
-  const isCorrect = selectedAnswer === question.correct;
-  const isLastQuestion = currentQuestion === sampleQuestions.length - 1;
+  // Auto-pulse on completion (300ms delay)
+  useEffect(() => {
+    if (finished) {
+      const t = setTimeout(() => togglePulse(), 300);
+      return () => clearTimeout(t);
+    }
+  }, [finished, togglePulse]);
 
-  const handleSelect = (index: number) => {
-    if (showResult) return;
-    setSelectedAnswer(index);
-    setShowResult(true);
-    if (index === question.correct) {
-      setScore(score + 1);
+  const q      = questions[idx];
+  const isLast = idx === questions.length - 1;
+  const pct    = Math.round( ((idx + (revealed ? 1 : 0)) / questions.length) * 100 );
+
+  const pick = (i: number) => {
+    if (revealed) return;
+    setChosen(i);
+    setRevealed(true);
+    const correct = q.options[i] === q.correct_answer;
+    if (correct) {
+      setScore(s => s + 1);
+    } else {
+      setIsWrong(true);
+      setTimeout(() => setIsWrong(false), 500);
     }
   };
 
-  const handleNext = () => {
-    if (isLastQuestion) {
-      // Would navigate to results
-      onNavigate('dashboard');
-      return;
-    }
-    setCurrentQuestion(currentQuestion + 1);
-    setSelectedAnswer(null);
-    setShowResult(false);
+  const next = () => {
+    if (isLast) { setFinished(true); return; }
+    setIdx(i => i + 1);
+    setChosen(null);
+    setRevealed(false);
+    setIsWrong(false);
   };
+
+  if (finished) return (
+    <div style={{ maxWidth:560, margin:"0 auto", paddingTop:64, display:"flex", flexDirection:"column", gap:40, alignItems:"center", textAlign:"center" }}>
+      <div>
+        <p style={{ color:"#A1A1AA", fontSize:13, margin:"0 0 12px" }}>Session complete</p>
+        <h1 style={{ fontSize:56, fontWeight:700, letterSpacing:"-0.04em", lineHeight:1, margin:0 }}>
+          {score}/{questions.length}
+        </h1>
+        <p style={{ color:"#A1A1AA", fontSize:15, margin:"16px 0 0" }}>
+          {score >= 8 ? "Excellent! Ready to review." : "Keep practicing to improve."}
+        </p>
+      </div>
+      <div style={{ display:"flex", flexDirection:"column", gap:12, width:"100%" }}>
+        <button
+          onClick={() => onNavigate("flashcards")}
+          style={{ height:56, borderRadius:8, background:"#fff", color:"#000", fontSize:15, fontWeight:700, border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:8, transition:"all 150ms ease", width:"100%" }}
+        >
+          Start Review <ArrowRight size={18}/>
+        </button>
+        <button onClick={onBack} className="btn-ghost" style={{ width:"100%" }}>Back to learn hub</button>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen pt-24 pb-24 px-4 flex flex-col">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="max-w-lg mx-auto w-full flex-1 flex flex-col"
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <button
-            onClick={() => onNavigate('dashboard')}
-            className="p-2 -ml-2 rounded-lg hover:bg-secondary calm-transition focus-calm"
+    <div style={{ width:"80%", margin:"0 auto", paddingTop:32, paddingBottom:64 }}>
+      {/* Progress bar */}
+      <div style={{ display:"flex", alignItems:"center", gap:16, marginBottom:64 }}>
+        <div style={{ flex:1, height:6, background:"#1F1F23", borderRadius:3 }}>
+          <motion.div
+            animate={{ width:`${pct}%` }}
+            transition={{ duration:0.3 }}
+            style={{ height:"100%", background:"#22C55E", borderRadius:3 }}
+          />
+        </div>
+        <span style={{ color:"#A1A1AA", fontSize:14, fontWeight:700 }}>{idx + 1} / {questions.length}</span>
+      </div>
+
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={idx}
+          initial={{ opacity:0, x:20 }}
+          animate={{ opacity:1, x:0 }}
+          exit={{   opacity:0, x:-20 }}
+          transition={{ duration:0.25, ease:"easeInOut" }}
+        >
+          <motion.h2
+            animate={isWrong ? { x: [-10, 10, -10, 10, 0] } : {}}
+            transition={{ duration: 0.4 }}
+            className="font-jp"
+            style={{ fontSize:48, fontWeight:800, lineHeight:1.3, marginBottom:64, color:"#fff", letterSpacing:"-0.02em" }}
           >
-            <ArrowLeft className="w-5 h-5 text-muted-foreground" />
-          </button>
-          
-          <div className="flex items-center gap-2">
-            {sampleQuestions.map((_, index) => (
-              <div
-                key={index}
-                className={`w-8 h-1 rounded-full calm-transition ${
-                  index < currentQuestion
-                    ? 'bg-success'
-                    : index === currentQuestion
-                      ? 'bg-primary'
-                      : 'bg-secondary'
-                }`}
-              />
-            ))}
+            {q.question}
+          </motion.h2>
+
+          <div style={{ display:"flex", flexDirection:"column", gap:16, width:"100%" }}>
+            {q.options.map((opt: string, i: number) => {
+              const isCorrect  = opt === q.correct_answer;
+              const isSelected = chosen === i;
+              
+              let borderColor = "#1F1F23";
+              let bg = "#121214";
+              let color = "#fff";
+              let glow = "none";
+
+              if (revealed) {
+                if (isCorrect) {
+                  borderColor = "#22C55E";
+                  bg = "rgba(34, 197, 94, 0.1)";
+                  color = "#22C55E";
+                  glow = "0 0 20px rgba(34, 197, 94, 0.2)";
+                } else if (isSelected) {
+                  borderColor = "#EF4444";
+                  bg = "rgba(239, 68, 68, 0.1)";
+                  color = "#EF4444";
+                } else {
+                  bg = "#0B0B0C";
+                  color = "#3a3a40";
+                }
+              }
+
+              return (
+                <button
+                  key={i}
+                  disabled={revealed}
+                  onClick={() => pick(i)}
+                  style={{
+                    width:"100%", padding:"24px 32px", borderRadius:12,
+                    border:`1px solid ${borderColor}`, background:bg, color,
+                    display:"flex", alignItems:"center", gap:20,
+                    fontSize:18, fontWeight:700, cursor:revealed ? "default" : "pointer",
+                    transition:"all 150ms ease", boxShadow:glow,
+                    textAlign:"left"
+                  }}
+                  onMouseEnter={e => !revealed && (e.currentTarget.style.borderColor = "#A1A1AA")}
+                  onMouseLeave={e => !revealed && (e.currentTarget.style.borderColor = "#1F1F23")}
+                >
+                  <span style={{ width:32, height:32, borderRadius:8, border:"1px solid currentColor", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, fontWeight:800, opacity:0.6 }}>
+                    {String.fromCharCode(65 + i)}
+                  </span>
+                  <span style={{ flex:1 }}>{opt}</span>
+                  {revealed && isCorrect  && <Check size={24} />}
+                  {revealed && isSelected && !isCorrect && <X size={24} />}
+                </button>
+              );
+            })}
           </div>
 
-          <span className="text-sm text-muted-foreground">
-            {currentQuestion + 1}/{sampleQuestions.length}
-          </span>
-        </div>
-
-        {/* Question Card */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={question.id}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="flex-1 flex flex-col"
-          >
-            {/* Question */}
-            <div className="glass-card p-8 mb-6 text-center">
-              <p className="text-sm text-muted-foreground mb-4">{question.question}</p>
-              <p className="font-jp text-5xl font-light text-foreground mb-4">
-                {question.character}
-              </p>
-              {question.type === 'reading' && (
-                <button className="p-2 rounded-full hover:bg-secondary calm-transition">
-                  <Volume2 className="w-5 h-5 text-muted-foreground" />
-                </button>
-              )}
-            </div>
-
-            {/* Options */}
-            <div className="space-y-3 flex-1">
-              {question.options.map((option, index) => {
-                const isSelected = selectedAnswer === index;
-                const isCorrectOption = index === question.correct;
-                
-                let optionStyle = 'glass-card-subtle hover:scale-[1.02]';
-                if (showResult) {
-                  if (isCorrectOption) {
-                    optionStyle = 'bg-success/20 border-2 border-success';
-                  } else if (isSelected && !isCorrectOption) {
-                    optionStyle = 'bg-destructive/20 border-2 border-destructive';
-                  } else {
-                    optionStyle = 'opacity-50';
-                  }
-                }
-
-                return (
-                  <motion.button
-                    key={index}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    onClick={() => handleSelect(index)}
-                    disabled={showResult}
-                    className={`w-full p-4 rounded-xl text-left calm-transition focus-calm ${optionStyle}`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className={`${question.type === 'reading' ? 'font-jp text-lg' : ''} text-foreground`}>
-                        {option}
-                      </span>
-                      {showResult && isCorrectOption && (
-                        <Check className="w-5 h-5 text-success" />
-                      )}
-                      {showResult && isSelected && !isCorrectOption && (
-                        <X className="w-5 h-5 text-destructive" />
-                      )}
-                    </div>
-                  </motion.button>
-                );
-              })}
-            </div>
-
-            {/* Feedback & Next */}
+          <div style={{ height:120, display:"flex", alignItems:"flex-end" }}>
             <AnimatePresence>
-              {showResult && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  className="mt-6 space-y-4"
+              {revealed && (
+                <motion.button
+                  initial={{ opacity:0, y:20 }}
+                  animate={{ opacity:1, y:0 }}
+                  onClick={next}
+                  style={{
+                    width:"100%", height:64, borderRadius:12,
+                    background:"#fff", color:"#000", border:"none",
+                    fontSize:17, fontWeight:800, cursor:"pointer",
+                    display:"flex", alignItems:"center", justifyContent:"center", gap:12,
+                    transition:"all 150ms ease"
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = "#e5e5e5"}
+                  onMouseLeave={e => e.currentTarget.style.background = "#fff"}
                 >
-                  <div className={`p-4 rounded-xl text-center ${
-                    isCorrect ? 'bg-success/10' : 'bg-destructive/10'
-                  }`}>
-                    <p className={`font-medium ${isCorrect ? 'text-success' : 'text-destructive'}`}>
-                      {isCorrect ? 'Correct! 正解！' : 'Not quite. 残念！'}
-                    </p>
-                  </div>
-
-                  <button
-                    onClick={handleNext}
-                    className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-medium flex items-center justify-center gap-2 calm-transition hover:opacity-90 focus-calm"
-                  >
-                    <span>{isLastQuestion ? 'Finish' : 'Next Question'}</span>
-                    <ArrowRight className="w-5 h-5" />
-                  </button>
-                </motion.div>
+                  {isLast ? "Complete Session" : "Next Question"} <ArrowRight size={20}/>
+                </motion.button>
               )}
             </AnimatePresence>
-          </motion.div>
-        </AnimatePresence>
-      </motion.div>
+          </div>
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }

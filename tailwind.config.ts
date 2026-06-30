@@ -2,138 +2,49 @@ import type { Config } from "tailwindcss";
 
 export default {
   darkMode: ["class"],
-  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
-  prefix: "",
+  content: [
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+  ],
   theme: {
-    container: {
-      center: true,
-      padding: "1rem",
-      screens: {
-        sm: "640px",
-        md: "768px",
-        lg: "1024px",
-        xl: "1280px",
-      },
-    },
     extend: {
-      fontFamily: {
-        sans: ['Inter', 'Noto Sans JP', 'system-ui', 'sans-serif'],
-        jp: ['Noto Sans JP', 'Hiragino Sans', 'sans-serif'],
-      },
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-        },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
-        success: {
-          DEFAULT: "hsl(var(--success))",
-          foreground: "hsl(var(--success-foreground))",
-        },
-        warning: {
-          DEFAULT: "hsl(var(--warning))",
-          foreground: "hsl(var(--warning-foreground))",
-        },
-        streak: "hsl(var(--streak))",
-        sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "hsl(var(--sidebar-primary))",
-          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
-        },
+      colors: {
+        background:  "hsl(240,10%,2%)",
+        surface:     "hsl(240,10%,4%)",
+        elevated:    "hsl(240,10%,8%)",
+        border:      "hsl(240,4%,10%)",
+        foreground:  "hsl(0,0%,98%)",
+        muted:       { DEFAULT:"hsl(240,4%,12%)", foreground:"hsl(240,4%,60%)" },
+        accent:      { DEFAULT:"#5E6AD2", soft:"#B4C6FC", vibrant:"#8b8ce6" },
+        success:     "#38C964",
+        error:       "#E13737",
       },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 4px)",
-        sm: "calc(var(--radius) - 8px)",
-        xl: "calc(var(--radius) + 4px)",
-        "2xl": "calc(var(--radius) + 8px)",
-        "3xl": "calc(var(--radius) + 16px)",
       },
-      spacing: {
-        'safe-bottom': 'env(safe-area-inset-bottom, 1rem)',
-        'safe-top': 'env(safe-area-inset-top, 0)',
+      fontFamily: {
+        sans:  ["Quicksand", "Inter", "Noto Sans JP", "system-ui", "sans-serif"],
+        display: ["BespokeStencil", "sans-serif"],
+        serif: ["Lora", "serif"],
+        jp:    ["Noto Sans JP", "Hiragino Sans", "sans-serif"],
       },
+      maxWidth: { content: "960px" },
+      width:    { sidebar: "260px" },
       keyframes: {
-        "accordion-down": {
-          from: { height: "0", opacity: "0" },
-          to: { height: "var(--radix-accordion-content-height)", opacity: "1" },
+        "fade-up": {
+          from: { opacity:"0", transform:"translateY(10px)" },
+          to:   { opacity:"1", transform:"translateY(0)" },
         },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)", opacity: "1" },
-          to: { height: "0", opacity: "0" },
-        },
-        "fade-in": {
-          "0%": { opacity: "0", transform: "translateY(8px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
-        },
-        "fade-out": {
-          "0%": { opacity: "1", transform: "translateY(0)" },
-          "100%": { opacity: "0", transform: "translateY(8px)" },
-        },
-        "slide-down": {
-          "0%": { opacity: "0", transform: "translateY(-10px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
-        },
-        "slide-up": {
-          "0%": { opacity: "0", transform: "translateY(10px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
-        },
-        "scale-in": {
-          "0%": { opacity: "0", transform: "scale(0.95)" },
-          "100%": { opacity: "1", transform: "scale(1)" },
-        },
-        "pulse-soft": {
-          "0%, 100%": { opacity: "1" },
-          "50%": { opacity: "0.7" },
-        },
-        "float": {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-4px)" },
+        shake: {
+          "0%,100%": { transform:"translateX(0)" },
+          "25%":     { transform:"translateX(-4px)" },
+          "75%":     { transform:"translateX(4px)" },
         },
       },
       animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in": "fade-in 0.4s ease-out",
-        "fade-out": "fade-out 0.3s ease-out",
-        "slide-down": "slide-down 0.3s ease-out",
-        "slide-up": "slide-up 0.3s ease-out",
-        "scale-in": "scale-in 0.2s ease-out",
-        "pulse-soft": "pulse-soft 2s ease-in-out infinite",
-        "float": "float 3s ease-in-out infinite",
+        "fade-up": "fade-up 200ms ease-in-out both",
+        shake:     "shake 300ms ease-in-out",
       },
     },
   },

@@ -25,3 +25,11 @@ dist-ssr
 
 # Environment Variables
 .env
+
+# Local MCP credentials
+mcp_config.json
+
+# Local tool state and caches
+.agents/
+.npm_cache/
+supabase/.temp/

@@ -1,202 +1,179 @@
+@font-face {
+  font-family: 'Quicksand';
+  src: url('/fonts/Quicksand-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'BespokeStencil';
+  src: url('/fonts/BespokeStencil-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* 
-  Nihongo Journey Design System
-  A calm, minimal, premium Japanese learning experience
-  Inspired by Apple HIG and Japanese zen aesthetics
-*/
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;500;600&display=swap');
-
 @layer base {
   :root {
-    /* Olive green & coffee palette - Light Mode */
-    --background: 75 25% 94%;
-    --foreground: 40 10% 20%;
-
-    --card: 35 30% 92%;
-    --card-foreground: 40 10% 20%;
-
-    --popover: 35 30% 95%;
-    --popover-foreground: 40 10% 20%;
-
-    --primary: 75 30% 28%;
-    --primary-foreground: 75 20% 96%;
-
-    --secondary: 35 25% 88%;
-    --secondary-foreground: 40 15% 25%;
-
-    --muted: 75 15% 90%;
-    --muted-foreground: 40 10% 45%;
-
-    --accent: 30 35% 45%;
-    --accent-foreground: 35 30% 96%;
-
-    --destructive: 0 60% 50%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 75 15% 85%;
-    --input: 75 15% 88%;
-    --ring: 75 30% 35%;
-
-    --radius: 1rem;
-
-    /* Glass effects */
-    --glass-bg: 35 30% 95% / 0.7;
-    --glass-border: 35 20% 80% / 0.4;
-    --glass-shadow: 40 20% 20% / 0.08;
+    /* Controlled Dark Surface Palette */
+    --bg-base: #8B8CE6; /* Global background stays as per user instructions */
+    --bg-surface: rgba(20, 20, 24, 0.75);
+    --bg-elevated: rgba(30, 30, 36, 0.95);
     
-    /* Semantic colors */
-    --success: 120 35% 40%;
-    --success-foreground: 120 20% 96%;
-    --warning: 40 70% 50%;
-    --warning-foreground: 40 80% 15%;
-    --streak: 35 60% 55%;
-
-    /* Sidebar - inherits main palette */
-    --sidebar-background: 75 25% 92%;
-    --sidebar-foreground: 40 10% 25%;
-    --sidebar-primary: 75 30% 28%;
-    --sidebar-primary-foreground: 75 20% 96%;
-    --sidebar-accent: 35 25% 88%;
-    --sidebar-accent-foreground: 40 15% 25%;
-    --sidebar-border: 75 15% 82%;
-    --sidebar-ring: 75 30% 35%;
+    --border-subtle: rgba(255, 255, 255, 0.06);
+    --border-default: rgba(255, 255, 255, 0.12); /* Slightly increased for visibility */
+    --border-strong: rgba(255, 255, 255, 0.2);
+    
+    --text-primary: #FFFFFF;
+    --text-secondary: #A1A1AA;
+    --text-muted: #71717A;
+    
+    --accent: #FFFFFF; /* High contrast accent */
+    --accent-glow: rgba(255, 255, 255, 0.1);
+    
+    --premium-blur: blur(6px);
+    --transition-premium: 600ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .dark {
-    /* Warm dark olive - Dark Mode */
-    --background: 60 15% 10%;
-    --foreground: 40 15% 90%;
-
-    --card: 50 12% 14%;
-    --card-foreground: 40 15% 90%;
-
-    --popover: 50 12% 12%;
-    --popover-foreground: 40 15% 90%;
-
-    --primary: 75 25% 70%;
-    --primary-foreground: 60 15% 10%;
-
-    --secondary: 45 10% 18%;
-    --secondary-foreground: 40 15% 85%;
-
-    --muted: 50 10% 20%;
-    --muted-foreground: 40 10% 60%;
-
-    --accent: 35 30% 55%;
-    --accent-foreground: 35 25% 10%;
-
-    --destructive: 0 55% 45%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 50 10% 20%;
-    --input: 50 10% 22%;
-    --ring: 75 25% 60%;
-
-    /* Glass effects - dark */
-    --glass-bg: 50 12% 15% / 0.75;
-    --glass-border: 50 10% 30% / 0.3;
-    --glass-shadow: 0 0% 0% / 0.3;
-
-    /* Semantic colors */
-    --success: 120 30% 50%;
-    --success-foreground: 120 15% 10%;
-    --warning: 40 65% 55%;
-    --warning-foreground: 40 80% 10%;
-    --streak: 35 55% 60%;
-
-    /* Sidebar - dark */
-    --sidebar-background: 60 12% 8%;
-    --sidebar-foreground: 40 15% 85%;
-    --sidebar-primary: 75 25% 70%;
-    --sidebar-primary-foreground: 60 15% 10%;
-    --sidebar-accent: 45 10% 16%;
-    --sidebar-accent-foreground: 40 15% 85%;
-    --sidebar-border: 50 10% 18%;
-    --sidebar-ring: 75 25% 60%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-
-  html {
-    font-family: 'Inter', 'Noto Sans JP', system-ui, sans-serif;
+  html, body, #root {
+    height: 100%;
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-family: 'Quicksand', 'Inter', sans-serif;
+    overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
 
-  body {
-    @apply bg-background text-foreground;
-    min-height: 100dvh;
+  h1, h2, h3, h4, h5, h6, .font-display {
+    font-family: 'BespokeStencil', sans-serif;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+  }
+
+  ::selection {
+    background: var(--text-primary);
+    color: #000000;
   }
 }
 
 @layer components {
-  /* Glassmorphism card */
+  /* Hand-Drawn Atmospheric Background */
+  .scholar-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image: url('/pink_drawn_bg.png');
+    background-size: cover;
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    opacity: 0.4; /* Reduced opacity to feel 'matches landing' */
+  }
+
+  .scholar-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, var(--bg-surface) 20%, transparent 80%);
+    pointer-events: none;
+  }
+
   .glass-card {
-    @apply relative overflow-hidden rounded-2xl;
-    background: hsl(var(--glass-bg));
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid hsl(var(--glass-border));
-    box-shadow: 0 8px 32px hsl(var(--glass-shadow));
+    background: rgba(18, 18, 20, 0.65);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 20px;
+    box-shadow: 0 4px 32px -4px rgba(0, 0, 0, 0.2);
+    transition: background 120ms ease, transform 80ms ease, border-color 120ms ease;
+    cursor: pointer;
   }
 
-  .glass-card-subtle {
-    @apply relative overflow-hidden rounded-xl;
-    background: hsl(var(--glass-bg));
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid hsl(var(--glass-border));
+  .glass-card:hover {
+    background: rgba(18, 18, 20, 0.8);
+    border-color: rgba(255, 255, 255, 0.12);
   }
 
-  /* Japanese typography */
-  .jp-text {
-    font-family: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
+  .glass-card:active {
+    background: #121214;
+    transform: scale(0.98);
   }
 
-  .jp-large {
-    @apply jp-text text-4xl font-light tracking-wide;
+  /* Senior UI Engineer Buttons */
+  .btn-pink {
+    background: rgba(30, 30, 36, 0.9);
+    color: #FFFFFF;
+    padding: 12px 32px;
+    border: 1px solid var(--border-default);
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    transition: background 120ms ease, transform 80ms ease;
+    backdrop-filter: blur(6px);
   }
 
-  /* Touch-friendly spacing */
-  .touch-target {
-    @apply min-h-[48px] min-w-[48px];
+  .btn-pink:hover {
+    background: rgba(40, 40, 48, 1);
   }
 
-  /* Calm transitions */
-  .calm-transition {
-    @apply transition-all duration-300 ease-out;
+  .btn-pink:active {
+    background: #000000;
+    transform: scale(0.98);
   }
 
-  /* Focus states */
-  .focus-calm {
-    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  .btn-secondary-pink {
+    background: rgba(18, 18, 20, 0.65);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 12px 40px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    backdrop-filter: blur(6px);
+    transition: background 120ms ease, transform 80ms ease;
+  }
+
+  .btn-secondary-pink:hover {
+    background: rgba(18, 18, 20, 0.8);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  .btn-secondary-pink:active {
+    background: #121214;
+    transform: scale(0.98);
+  }
+
+  /* Custom Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
   }
 }
 
-@layer utilities {
-  /* Hide scrollbar but keep functionality */
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Safe area padding for mobile */
-  .safe-bottom {
-    padding-bottom: env(safe-area-inset-bottom, 1rem);
-  }
-  
-  .safe-top {
-    padding-top: env(safe-area-inset-top, 0);
-  }
+/* Animations */
+@keyframes sumi-e-flow {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
 }
+
+.animate-sumi {
+  animation: sumi-e-flow 30s ease-in-out infinite;
+}
+
+.text-glow {
+  text-shadow: 0 0 20px rgba(219, 39, 119, 0.1);
+}
+
+.accent-glow {
+  box-shadow: 0 4px 40px -10px var(--accent-glow);
+}
+
+

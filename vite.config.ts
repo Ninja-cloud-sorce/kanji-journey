@@ -11,6 +11,11 @@ export default defineConfig(({ mode }) => ({
     hmr: {
       overlay: false,
     },
+    proxy: {
+       '/api': 'http://localhost:4000',
+       '/exam': 'http://localhost:4000',
+       '/auth': 'http://localhost:4000'
+    }
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {

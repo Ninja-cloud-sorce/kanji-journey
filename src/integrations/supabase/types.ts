@@ -18,47 +18,497 @@ export type Database = {
         Row: {
           created_at: string
           current_level: string
+          daily_goal_minutes: number
           display_name: string | null
           exam_date: string | null
           id: string
           learning_path: string | null
+          onboarding_completed: boolean
           readiness_score: number
           streak: number
           updated_at: string
           user_id: string
+          xp: number
+          avatar_url: string | null
+          bio: string | null
         }
         Insert: {
           created_at?: string
           current_level?: string
+          daily_goal_minutes?: number
           display_name?: string | null
           exam_date?: string | null
           id?: string
           learning_path?: string | null
+          onboarding_completed?: boolean
           readiness_score?: number
           streak?: number
           updated_at?: string
           user_id: string
+          xp?: number
+          avatar_url?: string | null
+          bio?: string | null
         }
         Update: {
           created_at?: string
           current_level?: string
+          daily_goal_minutes?: number
           display_name?: string | null
           exam_date?: string | null
           id?: string
           learning_path?: string | null
+          onboarding_completed?: boolean
           readiness_score?: number
           streak?: number
           updated_at?: string
           user_id?: string
+          xp?: number
+          avatar_url?: string | null
+          bio?: string | null
+        }
+        Relationships: []
+      }
+      lesson_catalog: {
+        Row: {
+          id: string
+          level: string
+          week_number: number
+          lesson_number: number
+          title: string
+          skill_area: string
+          topics: string[]
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          level: string
+          week_number: number
+          lesson_number?: number
+          title: string
+          skill_area: string
+          topics?: string[]
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          level?: string
+          week_number?: number
+          lesson_number?: number
+          title?: string
+          skill_area?: string
+          topics?: string[]
+          created_at?: string
+        }
+        Relationships: []
+      }
+      learning_paths: {
+        Row: {
+          id: string
+          user_id: string
+          selected_level: string
+          motivation: string | null
+          hours_per_week: number | null
+          prior_experience: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          selected_level?: string
+          motivation?: string | null
+          hours_per_week?: number | null
+          prior_experience?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          selected_level?: string
+          motivation?: string | null
+          hours_per_week?: number | null
+          prior_experience?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_paths_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      level_overrides: {
+        Row: {
+          id: string
+          user_id: string
+          level: string
+          confirmed_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          level: string
+          confirmed_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          level?: string
+          confirmed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "level_overrides_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      lesson_progress: {
+        Row: {
+          id: string
+          user_id: string
+          lesson_id: string
+          level: string
+          week_number: number
+          completed: boolean
+          completed_at: string | null
+          quiz_score: number | null
+          time_spent_sec: number | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          lesson_id: string
+          level: string
+          week_number: number
+          completed?: boolean
+          completed_at?: string | null
+          quiz_score?: number | null
+          time_spent_sec?: number | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          lesson_id?: string
+          level?: string
+          week_number?: number
+          completed?: boolean
+          completed_at?: string | null
+          quiz_score?: number | null
+          time_spent_sec?: number | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_progress_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lesson_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lesson_progress_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      quiz_attempts: {
+        Row: {
+          id: string
+          user_id: string
+          lesson_id: string
+          question_id: string
+          question_text: string
+          correct_answer: string
+          user_answer: string
+          is_correct: boolean
+          skill_area: string
+          topic: string
+          completed_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          lesson_id: string
+          question_id: string
+          question_text: string
+          correct_answer: string
+          user_answer: string
+          is_correct: boolean
+          skill_area: string
+          topic: string
+          completed_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          lesson_id?: string
+          question_id?: string
+          question_text?: string
+          correct_answer?: string
+          user_answer?: string
+          is_correct?: boolean
+          skill_area?: string
+          topic?: string
+          completed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_attempts_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lesson_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quiz_attempts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      weak_topics: {
+        Row: {
+          id: string
+          user_id: string
+          topic: string
+          skill_area: string
+          mistakes_count: number
+          last_seen_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          topic: string
+          skill_area: string
+          mistakes_count?: number
+          last_seen_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          topic?: string
+          skill_area?: string
+          mistakes_count?: number
+          last_seen_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weak_topics_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      flashcards: {
+        Row: {
+          id: string
+          user_id: string
+          lesson_id: string | null
+          front: string
+          back: string
+          ease_factor: number
+          interval_days: number
+          review_state: string
+          next_review_date: string
+          reviews_total: number
+          reviews_correct: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          lesson_id?: string | null
+          front: string
+          back: string
+          ease_factor?: number
+          interval_days?: number
+          review_state?: string
+          next_review_date?: string
+          reviews_total?: number
+          reviews_correct?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          lesson_id?: string | null
+          front?: string
+          back?: string
+          ease_factor?: number
+          interval_days?: number
+          review_state?: string
+          next_review_date?: string
+          reviews_total?: number
+          reviews_correct?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flashcards_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lesson_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flashcards_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      chat_messages: {
+        Row: {
+          id: string
+          user_id: string
+          role: string
+          content: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          role: string
+          content: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          role?: string
+          content?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+
+      practice_questions: {
+        Row: {
+          id: string
+          lesson_id: string
+          level: string
+          topic: string
+          section: string
+          prompt: string
+          display_text: string | null
+          options: string[]
+          correct_index: number
+          explanation: string | null
+          is_exam_ready: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          lesson_id: string
+          level: string
+          topic: string
+          section: string
+          prompt: string
+          display_text?: string | null
+          options: string[]
+          correct_index: number
+          explanation?: string | null
+          is_exam_ready?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          lesson_id?: string
+          level?: string
+          topic?: string
+          section?: string
+          prompt?: string
+          display_text?: string | null
+          options?: string[]
+          correct_index?: number
+          explanation?: string | null
+          is_exam_ready?: boolean
+          created_at?: string
         }
         Relationships: []
       }
     }
     Views: {
-      [_ in never]: never
+      collections: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          title: string
+          user_id: string | null
+        }
+        Relationships: []
+      }
+      lessons: {
+        Row: {
+          characters: string[] | null
+          collection_id: string
+          content: string | null
+          created_at: string
+          id: string
+          lesson_catalog_id: string | null
+          order_index: number
+          sort_order: number | null
+          subtitle: string | null
+          title: string
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      complete_lesson: {
+        Args: {
+          p_lesson_id: string
+          p_quiz_answers: Json
+          p_time_spent_sec?: number
+        }
+        Returns: Json
+      }
+      recalculate_readiness: {
+        Args: {
+          p_user_id: string
+          p_level: string
+        }
+        Returns: number
+      }
+      review_flashcard: {
+        Args: {
+          p_card_id: string
+          p_grade: number
+        }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never

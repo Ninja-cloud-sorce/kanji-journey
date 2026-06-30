@@ -1,0 +1,24 @@
+[
+  {
+    "id": "g-desu",
+    "pattern": "〜は〜です",
+    "usage": "Polite copula (to be)",
+    "sentence": "これは本___。",
+    "translation": "This is a book.",
+    "options": ["だ", "です", "ます", "ません"],
+    "correct": "です",
+    "explanation": "Desu is the formal polite way to say 'to be' for nouns and adjectives.",
+    "collection_id": "p1"
+  },
+  {
+    "id": "g-mashite",
+    "pattern": "〜ました",
+    "usage": "Polite past tense",
+    "sentence": "昨日、日本語を勉強し___。",
+    "translation": "I studied Japanese yesterday.",
+    "options": ["ました", "ます", "ません", "でしょう"],
+    "correct": "ました",
+    "explanation": "Mashita represents the polite past form of verbs.",
+    "collection_id": "p1"
+  }
+]

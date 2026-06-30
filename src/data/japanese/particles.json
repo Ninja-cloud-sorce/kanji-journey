@@ -1,0 +1,35 @@
+[
+  {
+    "id": "p-wa",
+    "particle": "は",
+    "usage": "Topic marker",
+    "sentence": "私は学生です。",
+    "translation": "I am a student.",
+    "options": ["が", "は", "に", "を"],
+    "correct": "は",
+    "explanation": "Use 'WA' to define the main topic of conversation.",
+    "collection_id": "p1"
+  },
+  {
+    "id": "p-ga",
+    "particle": "が",
+    "usage": "Subject marker",
+    "sentence": "犬___います。",
+    "translation": "There is a dog.",
+    "options": ["が", "を", "に", "も"],
+    "correct": "が",
+    "explanation": "Use 'GA' to mark the focus of a sentence, especially with existence verbs like 'iru'.",
+    "collection_id": "p1"
+  },
+  {
+    "id": "p-wo",
+    "particle": "を",
+    "usage": "Object marker",
+    "sentence": "ご飯___食べます。",
+    "translation": "I eat rice.",
+    "options": ["を", "は", "が", "に"],
+    "correct": "を",
+    "explanation": "Use 'WO' to mark the direct object receiving the action.",
+    "collection_id": "p1"
+  }
+]

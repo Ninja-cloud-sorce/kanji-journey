@@ -1,238 +1,249 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Check, ChevronDown, BookOpen, Headphones, PenTool, MessageSquare } from 'lucide-react';
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Lock, ArrowRight, BookOpen, Brain, Activity, Zap, Target, MessageSquare, Grid3x3 } from "lucide-react";
 
-interface RoadmapProps {
-  onNavigate: (page: string) => void;
-}
-
-const levels = [
-  {
-    id: 'N5',
-    name: 'N5',
-    title: 'Beginner',
-    status: 'current',
-    progress: 35,
-    weeks: [
-      { week: 1, title: 'Hiragana Mastery', status: 'complete' },
-      { week: 2, title: 'Katakana Mastery', status: 'complete' },
-      { week: 3, title: 'Basic Greetings & Particles', status: 'current' },
-      { week: 4, title: 'Numbers & Counting', status: 'locked' },
-      { week: 5, title: 'Basic Verbs', status: 'locked' },
-      { week: 6, title: 'Adjectives & Descriptions', status: 'locked' },
-      { week: 7, title: 'N5 Vocabulary Review', status: 'locked' },
-      { week: 8, title: 'N5 Mock Exam', status: 'locked' },
-    ],
-  },
-  {
-    id: 'N4',
-    name: 'N4',
-    title: 'Elementary',
-    status: 'locked',
-    progress: 0,
-    weeks: [],
-  },
-  {
-    id: 'N3',
-    name: 'N3',
-    title: 'Intermediate',
-    status: 'locked',
-    progress: 0,
-    weeks: [],
-  },
-  {
-    id: 'N2',
-    name: 'N2',
-    title: 'Upper Intermediate',
-    status: 'locked',
-    progress: 0,
-    weeks: [],
-  },
-  {
-    id: 'N1',
-    name: 'N1',
-    title: 'Advanced',
-    status: 'locked',
-    progress: 0,
-    weeks: [],
-  },
+const LEVELS = [
+  { id:"N5", label:"JLPT N5", desc:"Beginner — ~800 words", progress:38, locked:false },
+  { id:"N4", label:"JLPT N4", desc:"Elementary — ~1,500 words", progress:0, locked:false },
+  { id:"N3", label:"JLPT N3", desc:"Intermediate — ~3,700 words", progress:0, locked:true },
+  { id:"N2", label:"JLPT N2", desc:"Advanced — ~6,000 words",    progress:0, locked:true },
+  { id:"N1", label:"JLPT N1", desc:"Master — ~10,000 words",     progress:0, locked:true },
 ];
 
-const skillIcons = {
-  vocab: BookOpen,
-  listening: Headphones,
-  writing: PenTool,
-  grammar: MessageSquare,
-};
+interface Props {
+  onNavigate:    (page: string) => void;
+  onLevelSelect: (lvl: string) => void;
+  togglePulse:   () => void;
+  toggleChat:    () => void;
+  toggleCharts:  () => void;
+  profile?:      any;
+}
 
-export function Roadmap({ onNavigate }: RoadmapProps) {
-  const [expandedLevel, setExpandedLevel] = useState<string | null>('N5');
+export function Roadmap({ onNavigate, onLevelSelect, togglePulse, toggleChat, toggleCharts, profile }: Props) {
+  const [expanded, setExpanded] = useState<string | null>(profile?.current_level || "N5");
+  const readiness = profile?.readiness_score ?? 35;
+  const streak    = profile?.streak ?? 0;
+
+  const toggle = (id: string, locked: boolean) => {
+    if (locked) return;
+    const next = expanded === id ? null : id;
+    setExpanded(next);
+    if (next) onLevelSelect(next);
+  };
 
   return (
-    <div className="min-h-screen pt-24 pb-24 px-4">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="max-w-lg mx-auto"
+    <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 32 }}>
+      
+      {/* ── 1. CONTINUE LEARNING (TOP) ── */}
+      <button
+        onClick={() => onNavigate("practice")}
+        style={{
+          width:"100%", 
+          height: 88, 
+          borderRadius: 12,
+          background: "#fff", 
+          color: "#000",
+          border: "none", 
+          display: "flex", 
+          alignItems: "center", 
+          padding: "0 40px",
+          justifyContent: "space-between", 
+          cursor: "pointer", 
+          transition: "all 200ms cubic-bezier(0.23, 1, 0.32, 1)",
+          boxShadow: "0 20px 40px rgba(0,0,0,0.1)"
+        }}
+        onMouseEnter={e => {
+          e.currentTarget.style.transform="translateY(-2px)";
+          e.currentTarget.style.background="#f5f5f5";
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.transform="translateY(0)";
+          e.currentTarget.style.background="#fff";
+        }}
       >
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <h1 className="text-2xl font-light text-foreground mb-2">Your Journey</h1>
-          <p className="text-muted-foreground">N5 → N1 — One level at a time</p>
-        </motion.div>
+        <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+          <div style={{ width: 44, height: 44, borderRadius: "50%", background: "#000", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
+            <Zap size={20} fill="currentColor" />
+          </div>
+          <div style={{ textAlign: "left" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(0,0,0,0.4)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Next Step: Master N5 Kanji</div>
+            <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-0.03em" }}>Continue learning session</div>
+          </div>
+        </div>
+        <ArrowRight size={32} />
+      </button>
 
-        {/* Roadmap Path */}
-        <div className="relative">
-          {/* Connecting Line */}
-          <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-border" />
+      {/* ── 2. STATS ROW (3 Equal Blocks) ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+        <StatsCard icon={<Activity size={20}/>} label="Daily Streak" value={`${streak} Days`} color="#fff" />
+        <StatsCard icon={<Target size={20}/>} label="Mastery Sync" value={`${readiness}%`} color="#22C55E" />
+        <StatsCard icon={<BookOpen size={20}/>} label="Words Learnt" value="842" color="#fff" />
+      </div>
 
-          <div className="space-y-4">
-            {levels.map((level, index) => {
-              const isExpanded = expandedLevel === level.id;
-              const isCurrent = level.status === 'current';
-              const isLocked = level.status === 'locked';
-              const isComplete = level.status === 'complete';
+      <div style={{ display: "flex", gap: 32, alignItems: "flex-start" }}>
+        
+        {/* ── 3. ROADMAP (MAIN AREA - Dominant) ── */}
+        <div style={{ flex: 1, background: "#121214", border: "1px solid #1F1F23", borderRadius: 16, padding: 40 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 40 }}>
+            <h2 style={{ fontSize: 24, fontWeight: 800, letterSpacing: "-0.03em", margin: 0 }}>JLPT Learning Path</h2>
+            <div style={{ display:"flex", gap:12 }}>
+               <SmallAction icon={<Grid3x3 size={14}/>} label="Charts" onClick={toggleCharts} />
+               <SmallAction icon={<MessageSquare size={14}/>} label="Assistant" onClick={toggleChat} />
+            </div>
+          </div>
 
+          <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+            {LEVELS.map((lvl, i) => {
+              const active = expanded === lvl.id;
               return (
-                <motion.div
-                  key={level.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <button
-                    onClick={() => !isLocked && setExpandedLevel(isExpanded ? null : level.id)}
-                    disabled={isLocked}
-                    className={`w-full text-left focus-calm rounded-2xl ${
-                      isLocked ? 'cursor-not-allowed' : 'cursor-pointer'
-                    }`}
-                  >
-                    <div className={`glass-card p-5 ${
-                      isCurrent ? 'ring-2 ring-primary/30' : ''
-                    } ${isLocked ? 'opacity-50' : ''}`}>
-                      <div className="flex items-center gap-4">
-                        {/* Level Badge */}
-                        <div className={`relative z-10 w-12 h-12 rounded-xl flex items-center justify-center text-lg font-medium ${
-                          isComplete 
-                            ? 'bg-success text-success-foreground' 
-                            : isCurrent 
-                              ? 'bg-primary text-primary-foreground' 
-                              : 'bg-secondary text-muted-foreground'
-                        }`}>
-                          {isComplete ? (
-                            <Check className="w-6 h-6" />
-                          ) : isLocked ? (
-                            <Lock className="w-5 h-5" />
-                          ) : (
-                            <span className="font-jp">{level.name}</span>
-                          )}
-                        </div>
-
-                        {/* Level Info */}
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-foreground">{level.name}</span>
-                            <span className="text-muted-foreground">·</span>
-                            <span className="text-muted-foreground">{level.title}</span>
-                          </div>
-                          
-                          {isCurrent && (
-                            <div className="mt-2">
-                              <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                                <span>Progress</span>
-                                <span>{level.progress}%</span>
-                              </div>
-                              <div className="h-1 bg-secondary rounded-full overflow-hidden">
-                                <div 
-                                  className="h-full bg-primary rounded-full"
-                                  style={{ width: `${level.progress}%` }}
-                                />
-                              </div>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Expand Arrow */}
-                        {!isLocked && (
-                          <motion.div
-                            animate={{ rotate: isExpanded ? 180 : 0 }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            <ChevronDown className="w-5 h-5 text-muted-foreground" />
-                          </motion.div>
-                        )}
-                      </div>
-                    </div>
-                  </button>
-
-                  {/* Expanded Weeks */}
-                  <AnimatePresence>
-                    {isExpanded && level.weeks.length > 0 && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="ml-6 mt-2 pl-6 border-l-2 border-primary/20 space-y-2">
-                          {level.weeks.map((week, weekIndex) => {
-                            const weekCurrent = week.status === 'current';
-                            const weekComplete = week.status === 'complete';
-                            const weekLocked = week.status === 'locked';
-
-                            return (
-                              <motion.button
-                                key={week.week}
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: weekIndex * 0.05 }}
-                                onClick={() => weekCurrent && onNavigate('practice')}
-                                disabled={weekLocked}
-                                className={`w-full text-left p-4 rounded-xl calm-transition focus-calm ${
-                                  weekCurrent 
-                                    ? 'glass-card-subtle hover:scale-[1.02]' 
-                                    : weekComplete
-                                      ? 'bg-success/5'
-                                      : 'opacity-50'
-                                }`}
-                              >
-                                <div className="flex items-center gap-3">
-                                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                                    weekComplete 
-                                      ? 'bg-success/20 text-success' 
-                                      : weekCurrent
-                                        ? 'bg-primary/20 text-primary'
-                                        : 'bg-secondary text-muted-foreground'
-                                  }`}>
-                                    {weekComplete ? <Check className="w-3.5 h-3.5" /> : week.week}
-                                  </div>
-                                  <div className="flex-1">
-                                    <p className={`text-sm font-medium ${
-                                      weekLocked ? 'text-muted-foreground' : 'text-foreground'
-                                    }`}>
-                                      {week.title}
-                                    </p>
-                                    <p className="text-xs text-muted-foreground">Week {week.week}</p>
-                                  </div>
-                                  {weekLocked && <Lock className="w-4 h-4 text-muted-foreground" />}
-                                </div>
-                              </motion.button>
-                            );
-                          })}
-                        </div>
-                      </motion.div>
+                <div key={lvl.id} style={{ display: "flex", gap: 0, alignItems: "stretch" }}>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 80, flexShrink: 0 }}>
+                    <button
+                      onClick={() => toggle(lvl.id, lvl.locked)}
+                      style={{
+                        width: 56, height: 56, borderRadius: "50%",
+                        border: active ? "3px solid #fff" : "1px solid #1F1F23",
+                        background: active ? "#fff" : "#0B0B0C",
+                        color: active ? "#000" : (lvl.locked ? "#2a2a2d" : "#fff"),
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        cursor: lvl.locked ? "default" : "pointer",
+                        transition: "all 200ms ease",
+                        fontSize: 18, fontWeight: 800,
+                      }}
+                    >
+                      {lvl.locked ? <Lock size={18}/> : lvl.id}
+                    </button>
+                    {i < LEVELS.length - 1 && (
+                      <div style={{ width: 2, flex: 1, background: "#1F1F23", margin: "8px 0" }} />
                     )}
-                  </AnimatePresence>
-                </motion.div>
+                  </div>
+                  <div style={{ flex: 1, paddingLeft: 32, paddingBottom: i < LEVELS.length - 1 ? 40 : 0 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                      <div>
+                        <div style={{ fontSize: 20, fontWeight: 800, color: lvl.locked ? "#2a2a2d" : "#fff" }}>{lvl.label}</div>
+                        <div style={{ fontSize: 14, color: "#A1A1AA", fontWeight: 500 }}>{lvl.desc}</div>
+                      </div>
+                      {!lvl.locked && lvl.progress > 0 && (
+                        <div style={{ textAlign: "right" }}>
+                           <div style={{ fontSize: 15, fontWeight: 800, color: "#22C55E" }}>{lvl.progress}%</div>
+                        </div>
+                      )}
+                    </div>
+                    {!lvl.locked && lvl.progress > 0 && (
+                      <div style={{ width: "100%", height: 3, background: "#1F1F23", borderRadius: 2, overflow: "hidden" }}>
+                        <div style={{ width: `${lvl.progress}%`, height: "100%", background: "#22C55E", borderRadius: 2 }} />
+                      </div>
+                    )}
+                  </div>
+                </div>
               );
             })}
           </div>
         </div>
-      </motion.div>
+
+        {/* ── 4. ACTION PANEL (RIGHT/SIDE) ── */}
+        <div style={{ width: 340, display: "flex", flexDirection: "column", gap: 16 }}>
+          <div style={{ padding: 24, background: "#121214", border: "1px solid #1F1F23", borderRadius: 16 }}>
+             <h3 style={{ fontSize: 15, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "#A1A1AA", marginBottom: 24 }}>Session Control</h3>
+             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <LargeActionButton 
+                  icon={<BookOpen size={20}/>} 
+                  label="Practice Mode" 
+                  sub="New Kanji & Vocabulary" 
+                  onClick={() => onNavigate("practice")} 
+                  primary 
+                />
+                <LargeActionButton 
+                  icon={<Brain size={20}/>} 
+                  label="Review Session" 
+                  sub="Active Recall Training" 
+                  onClick={() => onNavigate("flashcards")} 
+                />
+             </div>
+          </div>
+
+          <div 
+            onClick={togglePulse}
+            style={{ 
+              padding: 24, 
+              background: "rgba(34, 197, 94, 0.05)", 
+              border: "1px solid rgba(34, 197, 94, 0.1)", 
+              borderRadius: 16,
+              cursor: "pointer"
+            }}
+          >
+             <div style={{ display: "flex", alignItems: "center", gap: 12, color: "#22C55E", marginBottom: 8 }}>
+                 <Zap size={16} fill="currentColor" />
+                 <span style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em" }}>System Pulse</span>
+             </div>
+             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", margin: 0, lineHeight: 1.5 }}>
+               Your learning efficiency is currenty <span style={{ color: "#fff", fontWeight: 700 }}>Optimal</span>.
+             </p>
+          </div>
+        </div>
+
+      </div>
     </div>
+  );
+}
+
+function StatsCard({ icon, label, value, color }: any) {
+  return (
+    <div style={{ background: "#121214", border: "1px solid #1F1F23", borderRadius: 12, padding: 32, display: "flex", alignItems: "center", gap: 24 }}>
+      <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(255,255,255,0.03)", display: "flex", alignItems: "center", justifyContent: "center", color: "#A1A1AA" }}>
+        {icon}
+      </div>
+      <div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: "#A1A1AA", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>{label}</div>
+        <div style={{ fontSize: 24, fontWeight: 800, color, letterSpacing: "-0.02em" }}>{value}</div>
+      </div>
+    </div>
+  );
+}
+
+function LargeActionButton({ icon, label, sub, onClick, primary=false }: any) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        width: "100%", padding: 24, borderRadius: 12,
+        background: primary ? "#fff" : "transparent",
+        color: primary ? "#000" : "#fff",
+        border: primary ? "none" : "1px solid #1F1F23",
+        display: "flex", flexDirection: "column", gap: 8,
+        cursor: "pointer", transition: "all 150ms ease",
+        textAlign: "left"
+      }}
+      onMouseEnter={e => {
+        e.currentTarget.style.transform = "scale(1.02)";
+        if (!primary) e.currentTarget.style.background = "rgba(255,255,255,0.03)";
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.transform = "scale(1)";
+        if (!primary) e.currentTarget.style.background = "transparent";
+      }}
+    >
+      <div style={{ color: primary ? "#000" : "#A1A1AA" }}>{icon}</div>
+      <div style={{ fontSize: 17, fontWeight: 800 }}>{label}</div>
+      <div style={{ fontSize: 12, opacity: 0.6 }}>{sub}</div>
+    </button>
+  );
+}
+
+function SmallAction({ icon, label, onClick }: any) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        display: "flex", alignItems: "center", gap: 8, padding: "8px 12px",
+        background: "rgba(255,255,255,0.03)", border: "1px solid #1F1F23",
+        borderRadius: 8, color: "#A1A1AA", fontSize: 12, fontWeight: 700,
+        cursor: "pointer", transition: "all 150ms ease"
+      }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor="#fff"; e.currentTarget.style.color="#fff"; }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor="#1F1F23"; e.currentTarget.style.color="#A1A1AA"; }}
+    >
+      {icon} {label}
+    </button>
   );
 }

@@ -1,0 +1,328 @@
+{
+  "jlpt_n5_important_questions": {
+    "total": 110,
+    "coverage": "All topics from real 2020-2025 tests (Kanji, Vocab, Grammar, Reading, Sentence composition, Text grammar)",
+    "quizzes": [
+      {
+        "id": "n5-01",
+        "topic": "kanji_reading",
+        "question": "この漢字の読み方は？  学校",
+        "options": ["がっこう", "がくせい", "こうこう", "がっこうせい"],
+        "correct_answer": "がっこう",
+        "explanation": "Real JLPT N5 kanji reading (most frequent in 2021-2025)"
+      },
+      {
+        "id": "n5-02",
+        "topic": "kanji_reading",
+        "question": "この漢字の読み方は？  先生",
+        "options": ["せんせい", "せんせ", "きょうせい", "せんせいさん"],
+        "correct_answer": "せんせい",
+        "explanation": "Very common in every N5 test"
+      },
+      {
+        "id": "n5-03",
+        "topic": "kanji_reading",
+        "question": "この漢字の読み方は？  食べる",
+        "options": ["たべる", "たべます", "しょく", "たべ"],
+        "correct_answer": "たべる",
+        "explanation": "Basic verb kanji reading"
+      },
+      {
+        "id": "n5-04",
+        "topic": "kanji_reading",
+        "question": "この漢字の読み方は？  水",
+        "options": ["みず", "すい", "みずよう", "みずみず"],
+        "correct_answer": "みず",
+        "explanation": "High-frequency N5 kanji"
+      },
+      {
+        "id": "n5-05",
+        "topic": "kanji_reading",
+        "question": "この漢字の読み方は？  本",
+        "options": ["ほん", "もと", "ほんとう", "ほんや"],
+        "correct_answer": "ほん",
+        "explanation": "Appears in almost every test"
+      },
+      {
+        "id": "n5-06",
+        "topic": "kanji_reading",
+        "question": "この漢字の読み方は？  明日",
+        "options": ["あした", "あす", "みょうにち", "あしたにち"],
+        "correct_answer": "あした",
+        "explanation": "Common time-word kanji"
+      },
+      {
+        "id": "n5-07",
+        "topic": "kanji_reading",
+        "question": "この漢字の読み方は？  雨",
+        "options": ["あめ", "う", "あめふり", "あめが"],
+        "correct_answer": "あめ",
+        "explanation": "Weather kanji – frequent"
+      },
+      {
+        "id": "n5-08",
+        "topic": "kanji_reading",
+        "question": "この漢字の読み方は？  花",
+        "options": ["はな", "か", "はなが", "はなみ"],
+        "correct_answer": "はな",
+        "explanation": "Basic noun"
+      },
+      {
+        "id": "n5-09",
+        "topic": "kanji_reading",
+        "question": "この漢字の読み方は？  見る",
+        "options": ["みる", "けん", "みます", "みせ"],
+        "correct_answer": "みる",
+        "explanation": "Verb kanji"
+      },
+      {
+        "id": "n5-10",
+        "topic": "kanji_reading",
+        "question": "この漢字の読み方は？  聞く",
+        "options": ["きく", "ぶん", "ききます", "きこ"],
+        "correct_answer": "きく",
+        "explanation": "Verb kanji"
+      },
+      {
+        "id": "n5-11",
+        "topic": "vocabulary",
+        "question": "「買う」の意味は？",
+        "options": ["to sell", "to buy", "to meet", "to play"],
+        "correct_answer": "to buy",
+        "explanation": "Core N5 verb – appears every year"
+      },
+      {
+        "id": "n5-12",
+        "topic": "vocabulary",
+        "question": "「売る」の意味は？",
+        "options": ["to buy", "to sell", "to open", "to close"],
+        "correct_answer": "to sell",
+        "explanation": "Opposite of 買う – very common pair"
+      },
+      {
+        "id": "n5-13",
+        "topic": "vocabulary",
+        "question": "「寝る」の意味は？",
+        "options": ["to wake up", "to sleep", "to go", "to come"],
+        "correct_answer": "to sleep",
+        "explanation": "Daily routine word"
+      },
+      {
+        "id": "n5-14",
+        "topic": "vocabulary",
+        "question": "「起きる」の意味は？",
+        "options": ["to sleep", "to wake up", "to enter", "to exit"],
+        "correct_answer": "to wake up",
+        "explanation": "Daily routine word"
+      },
+      {
+        "id": "n5-15",
+        "topic": "vocabulary",
+        "question": "「会う」の意味は？",
+        "options": ["to play", "to meet", "to return", "to open"],
+        "correct_answer": "to meet",
+        "explanation": "High-frequency verb"
+      },
+      {
+        "id": "n5-16",
+        "topic": "vocabulary",
+        "question": "「遊ぶ」の意味は？",
+        "options": ["to meet", "to play", "to write", "to read"],
+        "correct_answer": "to play",
+        "explanation": "Common in N5"
+      },
+      {
+        "id": "n5-17",
+        "topic": "vocabulary",
+        "question": "「帰る」の意味は？",
+        "options": ["to enter", "to return home", "to exit", "to open"],
+        "correct_answer": "to return home",
+        "explanation": "Very frequent"
+      },
+      {
+        "id": "n5-18",
+        "topic": "vocabulary",
+        "question": "「入る」の意味は？",
+        "options": ["to exit", "to enter", "to close", "to sleep"],
+        "correct_answer": "to enter",
+        "explanation": "Basic verb"
+      },
+      {
+        "id": "n5-19",
+        "topic": "vocabulary",
+        "question": "「出る」の意味は？",
+        "options": ["to enter", "to exit", "to open", "to close"],
+        "correct_answer": "to exit",
+        "explanation": "Basic verb"
+      },
+      {
+        "id": "n5-20",
+        "topic": "vocabulary",
+        "question": "「開ける」の意味は？",
+        "options": ["to close", "to open", "to buy", "to sell"],
+        "correct_answer": "to open",
+        "explanation": "Action verb"
+      },
+      {
+        "id": "n5-21",
+        "topic": "vocabulary",
+        "question": "「閉める」の意味は？",
+        "options": ["to open", "to close", "to read", "to write"],
+        "correct_answer": "to close",
+        "explanation": "Action verb"
+      },
+      {
+        "id": "n5-22",
+        "topic": "grammar",
+        "question": "私は学生___。",
+        "options": ["です", "だ", "ます", "ません"],
+        "correct_answer": "です",
+        "explanation": "Polite copula – appears in every test"
+      },
+      {
+        "id": "n5-23",
+        "topic": "grammar",
+        "question": "食べ___。",
+        "options": ["ません", "ました", "ましょう", "たいです"],
+        "correct_answer": "ません",
+        "explanation": "Negative polite form"
+      },
+      {
+        "id": "n5-24",
+        "topic": "grammar",
+        "question": "昨日学校に___。",
+        "options": ["行きます", "行きました", "行きません", "行きましょう"],
+        "correct_answer": "行きました",
+        "explanation": "Polite past tense"
+      },
+      {
+        "id": "n5-25",
+        "topic": "grammar",
+        "question": "一緒に食べ___。",
+        "options": ["ましょう", "ます", "ません", "たいです"],
+        "correct_answer": "ましょう",
+        "explanation": "Let's / shall we"
+      },
+      {
+        "id": "n5-26",
+        "topic": "grammar",
+        "question": "ドアを___ください。",
+        "options": ["開け", "開けて", "開けます", "開けません"],
+        "correct_answer": "開けて",
+        "explanation": "Please do ~ (te-form)"
+      },
+      {
+        "id": "n5-27",
+        "topic": "grammar",
+        "question": "写真を撮っても___です。",
+        "options": ["いい", "はいけません", "たい", "ましょう"],
+        "correct_answer": "いい",
+        "explanation": "Permission (てもいいです)"
+      },
+      {
+        "id": "n5-28",
+        "topic": "grammar",
+        "question": "ここでタバコを吸っては___。",
+        "options": ["いいです", "いけません", "たいです", "ましょう"],
+        "correct_answer": "いけません",
+        "explanation": "Prohibition"
+      },
+      {
+        "id": "n5-29",
+        "topic": "grammar",
+        "question": "日本に行きたい___。",
+        "options": ["です", "ます", "たいです", "ました"],
+        "correct_answer": "たいです",
+        "explanation": "Want to ~"
+      },
+      {
+        "id": "n5-30",
+        "topic": "grammar",
+        "question": "机の上に本___。",
+        "options": ["があります", "がいます", "です", "ます"],
+        "correct_answer": "があります",
+        "explanation": "There is (non-living)"
+      },
+      {
+        "id": "n5-31",
+        "topic": "grammar",
+        "question": "公園に犬___。",
+        "options": ["があります", "がいます", "です", "ます"],
+        "correct_answer": "がいます",
+        "explanation": "There is (living)"
+      },
+      {
+        "id": "n5-32",
+        "topic": "grammar",
+        "question": "学校___行きます。",
+        "options": ["に", "で", "を", "が"],
+        "correct_answer": "に",
+        "explanation": "Direction particle"
+      },
+      {
+        "id": "n5-33",
+        "topic": "grammar",
+        "question": "友達___会います。",
+        "options": ["に", "と", "で", "が"],
+        "correct_answer": "に",
+        "explanation": "Meeting particle"
+      },
+      {
+        "id": "n5-34",
+        "topic": "reading",
+        "question": "短い文章を読んで答えてください。\n私は毎日学校に行きます。学校で友達と話します。日本語を勉強します。\n質問：この人は何をしますか？",
+        "options": ["学校に行きます", "家に帰ります", "テレビを見ます", "寝ます"],
+        "correct_answer": "学校に行きます",
+        "explanation": "Short passage comprehension (real format)"
+      },
+      {
+        "id": "n5-35",
+        "topic": "reading",
+        "question": "昨日雨が降りました。私は家にいました。友達に電話をかけました。\n質問：昨日この人はどこにいましたか？",
+        "options": ["学校", "家", "公園", "駅"],
+        "correct_answer": "家",
+        "explanation": "Past tense reading"
+      },
+      {
+        "id": "n5-36",
+        "topic": "reading",
+        "question": "私の部屋は小さいです。でもきれいです。窓から山が見えます。\n質問：部屋から何が見えますか？",
+        "options": ["海", "山", "川", "空"],
+        "correct_answer": "山",
+        "explanation": "Description passage"
+      },
+      {
+        "id": "n5-37",
+        "topic": "reading",
+        "question": "明日友達と映画を見ます。映画は2時からです。\n質問：映画は何時からですか？",
+        "options": ["1時", "2時", "3時", "4時"],
+        "correct_answer": "2時",
+        "explanation": "Time information"
+      },
+      {
+        "id": "n5-38",
+        "topic": "reading",
+        "question": "この店は安いです。おいしいです。毎日たくさん人が来ます。\n質問：この店はどうですか？",
+        "options": ["高いです", "安いです", "大きいです", "小さいです"],
+        "correct_answer": "安いです",
+        "explanation": "Adjective comprehension"
+      },
+      {
+        "id": "n5-39",
+        "topic": "sentence_composition",
+        "question": "正しい文を作ってください。\nA. 食べます　B. ご飯を　C. 私は",
+        "options": ["A B C", "C B A", "C A B", "B C A"],
+        "correct_answer": "C B A",
+        "explanation": "Sentence composition (real JLPT style)"
+      },
+      {
+        "id": "n5-40",
+        "topic": "sentence_composition",
+        "question": "正しい順番は？\nA. 行きます　B. 学校に　C. 明日",
+        "options": ["C B A", "A B C", "B C A", "C A B"],
+        "correct_answer": "C B A",
+        "explanation": "Sentence composition"
+      }
+    ]
+  }
+}

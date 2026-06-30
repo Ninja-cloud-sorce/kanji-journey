@@ -1,0 +1,21 @@
+[
+  {
+    "id": "r-intro",
+    "title": "Self Introduction",
+    "text": "はじめまして。私はタナカです。東京に住んでいます。学生です。毎日日本語を勉強します。",
+    "translation": "Nice to meet you. I am Tanaka. I live in Tokyo. I am a student. I study Japanese every day.",
+    "questions": [
+      {
+        "q": "タナカさんはどこに住んでいますか？",
+        "options": ["大阪", "東京", "京都", "アメリカ"],
+        "correct": "東京"
+      },
+      {
+         "q": "タナカさんは何をしますか？",
+         "options": ["仕事をします", "寝ます", "勉強します", "映画を見ます"],
+         "correct": "勉強します"
+      }
+    ],
+    "collection_id": "h1"
+  }
+]

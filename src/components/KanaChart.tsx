@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { Volume2 } from 'lucide-react';
 import { KANA_EXAMPLES } from '@/data/kanaExamples';
 
@@ -57,6 +57,17 @@ export function KanaChart({ script }: KanaChartProps) {
   const [selectedCell, setSelectedCell] = useState<KanaCell | null>(null);
   const [clickedKana, setClickedKana] = useState<string | null>(null);
 
+  const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const quizTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
+      if (quizTimerRef.current) clearTimeout(quizTimerRef.current);
+    };
+  }, []);
+
   const allCells = useMemo(
     () => rows.flat().filter((c) => c.kana),
     [rows]
@@ -103,10 +114,14 @@ export function KanaChart({ script }: KanaChartProps) {
                 speak(cell.kana);
                 setSelectedCell(cell);
                 setClickedKana(cell.kana);
-                window.setTimeout(() => setClickedKana(null), 180);
+                if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
+                clickTimerRef.current = setTimeout(() => setClickedKana(null), 180);
                 if (!quizMode || !target) return;
                 setFeedback(cell.kana === target.kana ? 'Correct! Nice recall.' : `Not quite. Correct was ${target.kana}.`);
-                if (cell.kana === target.kana) window.setTimeout(nextQuiz, 650);
+                if (cell.kana === target.kana) {
+                  if (quizTimerRef.current) clearTimeout(quizTimerRef.current);
+                  quizTimerRef.current = setTimeout(nextQuiz, 650);
+                }
               }}
               className={`h-16 rounded-lg glass-card-subtle flex flex-col items-center justify-center calm-transition ${
                 isClicked ? 'scale-[0.96] ring-1 ring-primary/30' : 'hover:scale-[1.02]'

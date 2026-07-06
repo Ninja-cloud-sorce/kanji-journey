@@ -1,5 +1,7 @@
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useMemo, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
+
+const STORAGE_KEY = 'kairo:app-preferences';
 
 interface AppPreferences {
   language: string;
@@ -15,26 +17,49 @@ interface AppPreferencesContextValue extends AppPreferences {
   setNotificationsEnabled: (value: boolean) => void;
 }
 
+const DEFAULTS: AppPreferences = {
+  language: 'English',
+  themePreference: 'System',
+  audioPreference: 'Balanced',
+  notificationsEnabled: true,
+};
+
+function loadPreferences(): AppPreferences {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return { ...DEFAULTS, ...JSON.parse(raw) };
+  } catch {}
+  return DEFAULTS;
+}
+
+function savePreferences(prefs: AppPreferences) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+  } catch {}
+}
+
 const AppPreferencesContext = createContext<AppPreferencesContextValue | null>(null);
 
 export function AppPreferencesProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState('English');
-  const [themePreference, setThemePreference] = useState('System');
-  const [audioPreference, setAudioPreference] = useState('Balanced');
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [prefs, setPrefs] = useState<AppPreferences>(loadPreferences);
+
+  const update = useCallback((patch: Partial<AppPreferences>) => {
+    setPrefs(prev => {
+      const next = { ...prev, ...patch };
+      savePreferences(next);
+      return next;
+    });
+  }, []);
 
   const value = useMemo(
     () => ({
-      language,
-      themePreference,
-      audioPreference,
-      notificationsEnabled,
-      setLanguage,
-      setThemePreference,
-      setAudioPreference,
-      setNotificationsEnabled,
+      ...prefs,
+      setLanguage:             (v: string)  => update({ language: v }),
+      setThemePreference:      (v: string)  => update({ themePreference: v }),
+      setAudioPreference:      (v: string)  => update({ audioPreference: v }),
+      setNotificationsEnabled: (v: boolean) => update({ notificationsEnabled: v }),
     }),
-    [language, themePreference, audioPreference, notificationsEnabled]
+    [prefs, update]
   );
 
   return (

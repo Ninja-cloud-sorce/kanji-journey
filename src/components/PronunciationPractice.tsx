@@ -49,16 +49,16 @@ export function PronunciationPractice() {
           const data = await res.json();
           if (!res.ok) throw new Error(data?.message || `HTTP ${res.status}`);
           setResult(data);
-        } catch (err: any) {
-          setError(err.message || 'Failed to score pronunciation');
+        } catch (err: unknown) {
+          setError((err as Error).message || 'Failed to score pronunciation');
         } finally {
           setLoading(false);
         }
       };
       mediaRecorder.start();
       setRecording(true);
-    } catch (err: any) {
-      setError(err.message || 'Microphone access failed');
+    } catch (err: unknown) {
+      setError((err as Error).message || 'Microphone access failed');
     }
   };
 

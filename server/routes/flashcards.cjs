@@ -1,0 +1,106 @@
+'use strict';
+const express = require('express');
+const Flashcard = require('../models/Flashcard.cjs');
+const { authSupabase } = require('../middleware/authSupabase.cjs');
+const { sm2Review } = require('../services/srs.cjs');
+
+const router = express.Router();
+
+// GET /api/flashcards/:userId — all flashcards for a user
+router.get('/:userId', authSupabase(), async (req, res) => {
+  try {
+    const { userId } = req.params;
+    if (req.userId !== userId) return res.status(403).json({ error: 'Forbidden' });
+
+    const cards = await Flashcard.find({ user_id: userId }).lean();
+    return res.json(cards);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/flashcards/:userId/due?collectionId= — cards due for review today
+router.get('/:userId/due', authSupabase(), async (req, res) => {
+  try {
+    const { userId } = req.params;
+    if (req.userId !== userId) return res.status(403).json({ error: 'Forbidden' });
+
+    const today = new Date().toISOString().slice(0, 10);
+    const filter = { user_id: userId, next_review_date: { $lte: today } };
+
+    // If collectionId provided, filter by lessons in that collection.
+    // lesson_id on flashcards matches lesson catalog IDs for cards created by complete-lesson.
+    // For cards created via add-to-flashcards (lesson_id: null) we show them always.
+    const cards = await Flashcard.find(filter).lean();
+    return res.json(cards);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/flashcards — create a new flashcard (upsert by front to prevent duplicates)
+router.post('/', authSupabase(), async (req, res) => {
+  try {
+    const { user_id, lesson_id, front, back, next_review_date, review_state } = req.body;
+    if (req.userId !== user_id) return res.status(403).json({ error: 'Forbidden' });
+    if (!user_id || !front || !back) return res.status(400).json({ error: 'user_id, front and back are required' });
+
+    const today = new Date().toISOString().slice(0, 10);
+
+    const card = await Flashcard.findOneAndUpdate(
+      { user_id, front },
+      {
+        $setOnInsert: {
+          id:               crypto.randomUUID(),
+          user_id,
+          lesson_id:        lesson_id ?? null,
+          front,
+          back,
+          review_state:     review_state ?? 'new',
+          ease_factor:      2.5,
+          interval_days:    1,
+          next_review_date: next_review_date ?? today,
+          reviews_total:    0,
+          reviews_correct:  0,
+          created_at:       new Date().toISOString(),
+          updated_at:       new Date().toISOString(),
+        },
+      },
+      { new: true, upsert: true, lean: true }
+    );
+
+    return res.status(201).json(card);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/flashcards/:cardId/review — SM-2 review
+router.post('/:cardId/review', authSupabase(), async (req, res) => {
+  try {
+    const { cardId } = req.params;
+    const { grade } = req.body;
+
+    if (grade === undefined || grade < 0 || grade > 5) {
+      return res.status(400).json({ error: 'grade must be 0–5' });
+    }
+
+    const existing = await Flashcard.findOne({ id: cardId }).lean();
+    if (!existing) return res.status(404).json({ error: 'Flashcard not found' });
+    if (req.userId !== existing.user_id) return res.status(403).json({ error: 'Forbidden' });
+
+    const updates = sm2Review(existing, grade);
+
+    const updated = await Flashcard.findOneAndUpdate(
+      { id: cardId },
+      { $set: updates },
+      { new: true, lean: true }
+    );
+
+    return res.json(updated);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+module.exports = router;

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import readingData from '@/data/japanese/reading.json';
+import { queryKeys } from './queryKeys';
 
 export interface ReadingPassage {
   id: string;
@@ -16,7 +17,7 @@ export interface ReadingPassage {
 
 export function useReadingPassages(collectionId?: string | null) {
   return useQuery({
-    queryKey: ['reading-passages', collectionId],
+    queryKey: queryKeys.readingPassages(collectionId),
     staleTime: 60 * 1000,
     refetchOnWindowFocus: false,
     queryFn: async () => {

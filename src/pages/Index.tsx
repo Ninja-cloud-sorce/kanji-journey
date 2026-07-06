@@ -1,40 +1,33 @@
-import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, lazy, Suspense } from 'react';
 import { Navigation } from '@/components/Navigation';
-import { AIChatBubble } from "@/components/AIChatBubble";
 import { Onboarding } from "@/components/Onboarding";
 import { useAuth } from '@/hooks/useAuth';
 import { Outlet, useLocation } from 'react-router-dom';
 
+const AIChatBubble = lazy(() => import("@/components/AIChatBubble").then(m => ({ default: m.AIChatBubble })));
+
 export default function Index() {
-  const { isAuthenticated, isLoading, user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
   const location = useLocation();
+  const [onboardingDone, setOnboardingDone] = useState(false);
 
-  if (isLoading) {
+  // Onboarding Gate: wait until profile is resolved, then gate on onboarding_completed.
+  // Skip if localStorage flag is already set (survives reloads when MongoDB isn't connected).
+  const localOnboardingDone = localStorage.getItem('kairo_onboarding_done') === '1';
+  if (user && profile && !profile.onboarding_completed && !onboardingDone && !localOnboardingDone) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-[var(--bg-base)]">
-        <div className="flex flex-col items-center gap-6">
-          <div className="w-12 h-12 border-2 border-white/10 border-t-white rounded-full animate-spin" />
-          <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em] animate-pulse">Establishing Connection</span>
-        </div>
-      </div>
-    );
-  }
-
-  // Onboarding Gate: if authenticated but onboarding is not completed, enforce Onboarding walkthrough
-  if (profile && !profile.onboarding_completed) {
-    return (
-      <Onboarding 
-        userId={user!.id} 
-        onComplete={() => {
-          // Reload page to re-fetch authenticated session and state
-          window.location.reload();
-        }} 
+      <Onboarding
+        userId={user.id}
+        onComplete={async () => {
+          setOnboardingDone(true);
+          await refreshProfile(); // sync AuthContext with the DB-updated profile immediately
+        }}
       />
     );
   }
 
   const isDashboard = location.pathname === '/dashboard' || location.pathname === '/';
+
 
   return (
     <div className="flex h-screen w-full bg-[var(--bg-base)] overflow-hidden selection:bg-white/20 selection:text-white font-sans">
@@ -53,23 +46,16 @@ export default function Index() {
               : 'max-w-[1600px] mx-auto px-10 xl:px-14 py-14'
           }`}
         >
-          <AnimatePresence mode="popLayout" initial={false}>
-            <motion.div
-              key={location.pathname}
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-              className="h-full"
-            >
-              <Outlet />
-            </motion.div>
-          </AnimatePresence>
+          <div key={location.pathname} className="h-full animate-fade-in">
+            <Outlet />
+          </div>
         </div>
       </main>
 
-      {/* Global AI Oracle */}
-      <AIChatBubble />
+      {/* Global AI Oracle — lazy loaded; doesn't block first paint */}
+      <Suspense fallback={null}>
+        <AIChatBubble />
+      </Suspense>
     </div>
   );
 }

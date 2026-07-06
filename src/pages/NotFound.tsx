@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
 
 const NotFound = () => {
@@ -21,9 +21,9 @@ const NotFound = () => {
            <h1 className="text-6xl font-serif font-bold text-primary tracking-tight">404</h1>
            <p className="text-2xl font-serif text-pink-900/60 lowercase italic font-medium">This path led to a void in the sanctuary.</p>
         </div>
-        <a href="/" className="btn-pink !px-16 !py-4 shadow-xl">
+        <Link to="/" className="btn-pink !px-16 !py-4 shadow-xl">
           RETURN TO SCHOLARSHIP
-        </a>
+        </Link>
       </div>
     </div>
   );

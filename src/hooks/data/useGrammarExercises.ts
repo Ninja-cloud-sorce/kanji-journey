@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import particleData from '@/data/japanese/particles.json';
 import grammarData from '@/data/japanese/grammar.json';
+import { queryKeys } from './queryKeys';
 
 export interface GrammarQuestion {
   id: string;
@@ -16,7 +17,7 @@ export interface GrammarQuestion {
 
 export function useGrammarExercises(collectionId?: string | null) {
   return useQuery({
-    queryKey: ['grammar-exercises', collectionId],
+    queryKey: queryKeys.grammarExercises(collectionId),
     staleTime: 60 * 1000,
     refetchOnWindowFocus: false,
     queryFn: async () => {

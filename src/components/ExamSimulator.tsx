@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useGeneratedExam, type PracticeQuestion } from '@/hooks/data/usePracticeQuestions';
+import { api } from '@/integrations/api/client';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Profile = Tables<'profiles'>;
@@ -31,6 +32,7 @@ export function ExamSimulator({ profile }: ExamSimulatorProps) {
     listening: [],
   });
   const [finished, setFinished] = useState(false);
+  const savedRef = useRef(false);
 
   const section = SECTIONS[sectionIndex];
   const { data: generatedExam, isLoading } = useGeneratedExam(profile.current_level);
@@ -72,8 +74,35 @@ export function ExamSimulator({ profile }: ExamSimulatorProps) {
     setAnswers((prev) => ({ ...prev, [current.id]: idx }));
   };
 
+  const persistExamResults = async (allSectionQs: Record<Section, PracticeQuestion[]>) => {
+    if (savedRef.current) return;
+    savedRef.current = true;
+
+    const now = new Date().toISOString();
+    const payload: { user_id: string; topic: string; skill_area: string; mistakes_count: number; last_seen_at: string }[] = [];
+
+    for (const s of SECTIONS) {
+      for (const q of (allSectionQs[s] ?? [])) {
+        if (answers[q.id] !== q.correct_index) {
+          payload.push({
+            user_id:       profile.user_id,
+            topic:         q.topic as string,
+            skill_area:    s,
+            mistakes_count: 1,
+            last_seen_at:  now,
+          });
+        }
+      }
+    }
+
+    if (payload.length > 0) {
+      await api.post('/api/weak-topics/batch', { items: payload });
+    }
+  };
+
   const nextSectionOrFinish = () => {
     if (sectionIndex >= SECTIONS.length - 1) {
+      persistExamResults(sectionQuestions);
       setFinished(true);
       setStarted(false);
       return;

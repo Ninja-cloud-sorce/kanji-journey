@@ -1,13 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  LayoutDashboard, 
-  Library, 
-  PenTool, 
-  BarChart2, 
+import {
+  LayoutDashboard,
+  Library,
+  PenTool,
+  BarChart2,
   User,
   Settings as SettingsIcon,
-  Plus
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -79,15 +78,6 @@ export function Navigation() {
         ))}
       </nav>
 
-      {/* New Session Button */}
-      <div className="px-6 mt-auto">
-        <button 
-          onClick={() => navigate('/session/quiz')}
-          className="bg-white text-black hover:bg-white/90 w-full min-h-[52px] flex items-center justify-center gap-3 rounded-xl transition-all font-black text-xs uppercase tracking-[0.2em] shadow-xl"
-        >
-           <Plus size={16} strokeWidth={4} /> New Session
-        </button>
-      </div>
     </div>
   );
 }

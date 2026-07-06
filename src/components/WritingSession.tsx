@@ -21,7 +21,7 @@ import { GlassCard } from './ui/GlassCard';
 import { useStore } from '@/store/useStore';
 import { useAuth } from '@/hooks/useAuth';
 import { useCompleteLesson } from '@/hooks/data/useLessonProgress';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/integrations/api/client';
 import hiraganaData from '@/data/japanese/hiragana.json';
 import katakanaData from '@/data/japanese/katakana.json';
 
@@ -69,14 +69,14 @@ export function WritingSession({ onBack }: { onBack: () => void }) {
         return;
       }
 
-      const { data, error } = await supabase
-        .from('lessons')
-        .select('*')
-        .eq('collection_id', selectedLessonId)
-        .order('sort_order', { ascending: true })
-        .limit(1);
-      
-      if (!error) setLesson(data?.[0] ?? null);
+      try {
+        const data = await api.get<{ id: string; title: string; characters?: string[] }>(
+          `/api/lessons/${selectedLessonId}`
+        );
+        setLesson(data ?? null);
+      } catch {
+        setLesson(null);
+      }
       setLoading(false);
     }
     fetchLesson();
@@ -184,7 +184,7 @@ export function WritingSession({ onBack }: { onBack: () => void }) {
                          initial={{ opacity: 0, scale: 0.8 }}
                          animate={{ opacity: 1, scale: 1 }}
                          exit={{ opacity: 0, scale: 1.2 }}
-                         className="text-[160px] font-display font-bold text-white tracking-tighter select-none font-display z-10"
+                         className="text-[160px] font-display font-bold text-white tracking-tighter select-none z-10"
                        >
                          {currentChar}
                        </motion.span>
@@ -205,7 +205,7 @@ export function WritingSession({ onBack }: { onBack: () => void }) {
                </GlassCard>
 
                {/* Drawing Canvas Area placeholder */}
-               <GlassCard className="bg-white/5 border-white/10 p-12 relative flex flex-col overflow-hidden shadow-inner flex flex-col items-start">
+               <GlassCard className="bg-white/5 border-white/10 p-12 relative flex flex-col overflow-hidden shadow-inner items-start">
                   {/* Grid Background */}
                   <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #FFFFFF 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
                   
@@ -218,12 +218,7 @@ export function WritingSession({ onBack }: { onBack: () => void }) {
                      </button>
                   </div>
 
-                  <div className="flex-1 flex items-center justify-center relative font-display w-full">
-                     <span className="text-[240px] text-white opacity-[0.03] select-none pointer-events-none font-bold">
-                       {currentChar}
-                     </span>
-                     <p className="absolute text-[10px] font-black text-white/10 uppercase tracking-[0.5em] bottom-10">Trace directly on the stone</p>
-                  </div>
+                  <div className="flex-1 w-full" />
 
                </GlassCard>
             </div>

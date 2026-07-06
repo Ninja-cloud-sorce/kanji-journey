@@ -20,7 +20,7 @@ export function Practice() {
   const sessions = getPracticeSessionCards();
   const recommendedSession = [...sessions].sort((a, b) => b.itemCount - a.itemCount)[0];
 
-  if (!user || !profile) return null;
+  if (!user || !profile) return <div className="flex items-center justify-center min-h-[60vh]"><div className="w-8 h-8 border-2 border-white/10 border-t-white rounded-full animate-spin" /></div>;
 
   return (
     <div className="flex flex-col gap-10 animate-fade-in w-full pb-20 mt-4 text-left font-sans text-white">

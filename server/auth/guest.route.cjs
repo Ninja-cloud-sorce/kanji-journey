@@ -4,7 +4,11 @@ const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 
-const GUEST_JWT_SECRET = process.env.GUEST_JWT_SECRET || 'replace-me-in-production';
+const GUEST_JWT_SECRET = process.env.GUEST_JWT_SECRET ||
+  (process.env.NODE_ENV !== 'production' ? 'dev-only-insecure-secret' : null);
+if (!GUEST_JWT_SECRET) {
+  throw new Error('GUEST_JWT_SECRET must be set in production');
+}
 const GUEST_COOKIE_NAME = 'guest_session';
 
 function buildGuestUser() {

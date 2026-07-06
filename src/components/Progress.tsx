@@ -40,7 +40,7 @@ export function Progress() {
   });
   const chartData = history && history.length > 0 ? rawWeeks : [40, 60, 55, 80, 95, 70, 85, 92];
 
-  if (!user || !profile) return null;
+  if (!user || !profile) return <div className="flex items-center justify-center min-h-[60vh]"><div className="w-8 h-8 border-2 border-white/10 border-t-white rounded-full animate-spin" /></div>;
 
   // Calculate activity for last 30 days
   const today = new Date();

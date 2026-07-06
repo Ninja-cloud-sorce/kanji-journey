@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ArrowLeft, 
-  HelpCircle, 
-  CheckCircle2, 
+import {
+  HelpCircle,
+  CheckCircle2,
   XCircle,
   Loader2,
   Trophy,
@@ -12,11 +11,16 @@ import {
 import { GlassCard } from './ui/GlassCard';
 import { useStore } from '@/store/useStore';
 import { useVocabQuiz, VocabQuestion } from '@/hooks/data/useVocabQuiz';
+import { useUpdateProgress } from '@/hooks/data/useUpdateProgress';
+import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 
 export function VocabularyQuiz({ onBack }: { onBack: () => void }) {
   const { selectedLessonId } = useStore();
+  const { user, profile } = useAuth();
   const { data: questions, isLoading } = useVocabQuiz(selectedLessonId);
+  const updateProgress = useUpdateProgress();
+  const savedRef = useRef(false);
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -28,22 +32,30 @@ export function VocabularyQuiz({ onBack }: { onBack: () => void }) {
 
   const handleOptionClick = (option: string) => {
     if (selectedOption !== null) return;
-    
+
     setSelectedOption(option);
     const correct = option === currentQuestion?.correct;
     setIsCorrect(correct);
-    
-    if (correct) {
-      setScore(s => s + 1);
-    }
 
-    // Auto-advance after delay
+    const newScore = correct ? score + 1 : score;
+    if (correct) setScore(newScore);
+
     setTimeout(() => {
       if (questions && currentIndex < questions.length - 1) {
         setCurrentIndex(i => i + 1);
         setSelectedOption(null);
         setIsCorrect(null);
       } else {
+        // Persist XP when the last question is answered
+        const finalScore = Math.round((newScore / (questions?.length ?? 1)) * 100);
+        if (user?.id && profile?.current_level && !savedRef.current) {
+          savedRef.current = true;
+          updateProgress.mutate({
+            userId: user.id,
+            level: profile.current_level,
+            score: finalScore,
+          });
+        }
         setIsFinished(true);
       }
     }, 1500);

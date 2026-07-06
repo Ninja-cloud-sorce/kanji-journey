@@ -20,11 +20,15 @@ import {
 import { GlassCard } from './ui/GlassCard';
 import { useStore } from '@/store/useStore';
 import { useReadingPassages, ReadingPassage } from '@/hooks/data/useReadingPassages';
+import { useUpdateProgress } from '@/hooks/data/useUpdateProgress';
+import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 
 export function ReadingSession({ onBack }: { onBack: () => void }) {
-  const { selectedLessonId, updateProgress } = useStore();
+  const { selectedLessonId } = useStore();
+  const { user, profile } = useAuth();
   const { data: passages, isLoading } = useReadingPassages(selectedLessonId);
+  const updateProgress = useUpdateProgress();
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showTranslation, setShowTranslation] = useState(false);
@@ -43,9 +47,13 @@ export function ReadingSession({ onBack }: { onBack: () => void }) {
     return () => clearInterval(timer);
   }, [startTime]);
 
-  const handleFinish = async () => {
-    if (selectedLessonId) {
-      updateProgress(selectedLessonId as any, 100);
+  const handleFinish = () => {
+    if (user?.id && profile?.current_level) {
+      updateProgress.mutate({
+        userId: user.id,
+        level: profile.current_level,
+        score: 100,
+      });
     }
     onBack();
   };

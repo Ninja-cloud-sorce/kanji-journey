@@ -1,59 +1,86 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  User, 
-  Volume2, 
+import {
+  User,
   ChevronRight,
-  LogOut,
-  Bell,
-  Zap,
-  Check,
-  Camera, 
-  Loader2, 
+  Loader2,
   Save,
-  VolumeX,
-  Volume1
+  Upload,
 } from "lucide-react";
 import { GlassCard } from './ui/GlassCard';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { useAppPreferences } from '@/context/AppPreferencesContext';
+
+export const AVATAR_PRESETS = [
+  { id: 'preset:学', kanji: '学', bg: 'from-white/10 to-white/5',   label: 'Scholar'  },
+  { id: 'preset:道', kanji: '道', bg: 'from-blue-500/20 to-blue-900/10', label: 'Path'    },
+  { id: 'preset:武', kanji: '武', bg: 'from-red-500/20 to-red-900/10',  label: 'Warrior' },
+  { id: 'preset:文', kanji: '文', bg: 'from-amber-500/20 to-amber-900/10', label: 'Culture'},
+  { id: 'preset:月', kanji: '月', bg: 'from-indigo-500/20 to-indigo-900/10', label: 'Moon' },
+  { id: 'preset:花', kanji: '花', bg: 'from-pink-500/20 to-pink-900/10', label: 'Flower'  },
+  { id: 'preset:龍', kanji: '龍', bg: 'from-emerald-500/20 to-emerald-900/10', label: 'Dragon'},
+  { id: 'preset:鳥', kanji: '鳥', bg: 'from-sky-500/20 to-sky-900/10',  label: 'Bird'    },
+  { id: 'preset:星', kanji: '星', bg: 'from-violet-500/20 to-violet-900/10', label: 'Star' },
+  { id: 'preset:風', kanji: '風', bg: 'from-teal-500/20 to-teal-900/10', label: 'Wind'   },
+  { id: 'preset:火', kanji: '火', bg: 'from-orange-500/20 to-orange-900/10', label: 'Fire' },
+  { id: 'preset:水', kanji: '水', bg: 'from-cyan-500/20 to-cyan-900/10', label: 'Water'   },
+];
+
+export function AvatarDisplay({ avatarUrl, size = 'md', className = '' }: { avatarUrl?: string | null; size?: 'sm' | 'md' | 'lg'; className?: string }) {
+  const preset = AVATAR_PRESETS.find(p => p.id === avatarUrl);
+  const sizeClass = size === 'sm' ? 'text-2xl' : size === 'lg' ? 'text-7xl' : 'text-4xl';
+
+  if (preset) {
+    return (
+      <div className={`w-full h-full bg-gradient-to-br ${preset.bg} flex items-center justify-center ${className}`}>
+        <span className={`${sizeClass} font-display font-bold text-white select-none`}>{preset.kanji}</span>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={avatarUrl || '/images/default-avatar.svg'}
+      alt="Avatar"
+      className={`w-full h-full object-cover ${className}`}
+      onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/default-avatar.svg'; }}
+    />
+  );
+}
 
 export function Settings() {
-  const { profile, updateProfile, signOut } = useAuth();
-  const { 
-    audioPreference, 
-    setAudioPreference, 
-    notificationsEnabled, 
-    setNotificationsEnabled 
-  } = useAppPreferences();
+  const { profile, updateProfile } = useAuth();
 
   const [activeSection, setActiveSection] = useState('identity');
-  const [isSyncing, setIsSyncing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  
-  // Local state for form
+  const [isUploading, setIsUploading] = useState(false);
+
   const [displayName, setDisplayName] = useState(profile?.display_name || '');
   const [bio, setBio] = useState(profile?.bio || '');
-  const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || '');
-  const [dailyGoal, setDailyGoal] = useState(profile?.daily_goal_minutes || 15);
+  const [selectedAvatar, setSelectedAvatar] = useState(profile?.avatar_url || '');
 
-  if (!profile) return null;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (profile) {
+      setDisplayName(profile.display_name || '');
+      setBio(profile.bio || '');
+      setSelectedAvatar(profile.avatar_url || '');
+    }
+  }, [profile]);
+
+  if (!profile) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="w-8 h-8 border-2 border-white/10 border-t-white rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   const SECTIONS = [
     { id: 'identity', label: 'Identity', icon: User },
-    { id: 'rituals', label: 'Rituals', icon: Bell },
-    { id: 'audio', label: 'Audio', icon: Volume2 },
   ];
-
-  const handleSync = () => {
-    setIsSyncing(true);
-    setTimeout(() => {
-      setIsSyncing(false);
-      toast.success("Synchronized with Sanctuary Network");
-    }, 1500);
-  };
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,59 +89,43 @@ export function Settings() {
       const { error } = await updateProfile({
         display_name: displayName,
         bio: bio,
-        avatar_url: avatarUrl,
-        daily_goal_minutes: dailyGoal
+        avatar_url: selectedAvatar || null,
       });
       if (error) throw error;
       toast.success("Identity records updated");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to update profile");
+    } catch (err: unknown) {
+      toast.error((err as Error).message || "Failed to update profile");
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
-    setIsSaving(true);
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be under 5 MB');
+      return;
+    }
+    setIsUploading(true);
     try {
-      const fileExt = file.name.split('.').pop();
-      const filePath = `${profile.user_id}/${Math.random()}.${fileExt}`;
-      
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file, { upsert: true });
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-
-      setAvatarUrl(publicUrl);
-      toast.success("Avatar image uploaded to Sanctuary storage");
-    } catch (err: any) {
-      console.error("Avatar upload failed:", err);
-      toast.error(`Avatar upload failed: ${err.message}`);
+      const ext = file.name.split('.').pop();
+      const path = `${profile.user_id}/${crypto.randomUUID()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from('avatars').upload(path, file, { upsert: true });
+      if (upErr) throw upErr;
+      const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path);
+      // Update local state AND persist immediately so Profile reflects it without needing form submit
+      setSelectedAvatar(publicUrl);
+      await updateProfile({ avatar_url: publicUrl });
+      toast.success('Profile photo updated');
+    } catch (err: unknown) {
+      toast.error(`Upload failed: ${(err as Error).message}`);
     } finally {
-      setIsSaving(false);
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
-  const handleGoalUpdate = async (minutes: number) => {
-    setDailyGoal(minutes);
-    try {
-      const { error } = await updateProfile({
-        daily_goal_minutes: minutes
-      });
-      if (error) throw error;
-      toast.success(`Daily goal updated to ${minutes} minutes`);
-    } catch (err: any) {
-      toast.error("Failed to update daily goal");
-    }
-  };
 
   return (
     <div className="flex flex-col gap-12 animate-fade-in w-full pb-20 mt-4 text-left font-sans text-white">
@@ -142,15 +153,6 @@ export function Settings() {
               </button>
             ))}
             
-            <div className="pt-8 space-y-4 w-full border-t border-white/10 flex flex-col items-start font-sans">
-               <button 
-                  onClick={() => signOut()}
-                  className="w-full p-6 text-[10px] font-black text-white/20 hover:text-red-400 uppercase tracking-[0.3em] flex items-center gap-4 transition-all group pt-6 active:scale-95"
-                >
-                  <LogOut size={18} />
-                  Terminate Session
-               </button>
-            </div>
          </aside>
 
          {/* Right: Content Area */}
@@ -162,27 +164,60 @@ export function Settings() {
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-12 w-full flex flex-col items-start">
                   <div className="space-y-4 flex flex-col items-start font-sans text-left">
                       <h3 className="text-4xl font-display font-bold text-white tracking-tight uppercase">Scholar Identity</h3>
-                      <p className="text-white/60 text-base font-medium leading-relaxed italic font-display opacity-80 uppercase tracking-wider">Update your credentials and digital presence within the Kanji Journey ecosystem.</p>
+                      <p className="text-white/60 text-base font-medium leading-relaxed italic font-display opacity-80 uppercase tracking-wider">Update your credentials and digital presence within the Kairo ecosystem.</p>
                   </div>
 
                   <form onSubmit={handleUpdateProfile} className="w-full space-y-10 flex flex-col items-start">
-                     {/* Avatar Section */}
-                     <div className="flex items-center gap-12 p-10 rounded-[32px] bg-white/5 w-full shadow-xl border border-white/5 group">
-                      <div className="relative w-32 h-32 rounded-[24px] bg-white/5 border border-white/10 overflow-hidden shadow-2xl flex-shrink-0">
-                         <img 
-                            src={avatarUrl || '/placeholder.svg'} 
-                            className="w-full h-full object-cover transition-all group-hover:scale-105"
-                            alt="avatar"
-                         />
-                         <label className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center cursor-pointer">
-                            <Camera size={24} className="text-white translate-y-2 group-hover:translate-y-0 transition-transform" />
-                            <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} />
-                         </label>
-                      </div>
-                      <div className="space-y-3 flex flex-col items-start font-sans">
-                         <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Identity Avatar</h4>
-                         <p className="text-[13px] text-white/60 italic font-display uppercase tracking-widest leading-relaxed">Click image to upload new credentials visual</p>
-                      </div>
+                     {/* Avatar Picker */}
+                     <div className="space-y-6 w-full flex flex-col items-start">
+                       <label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 ml-1">Profile Icon</label>
+
+                       <div className="flex items-start gap-10 w-full">
+                         {/* Preview + upload */}
+                         <div className="flex flex-col items-center gap-4 flex-shrink-0">
+                           <div className="w-24 h-24 rounded-2xl border border-white/20 overflow-hidden shadow-xl">
+                             <AvatarDisplay avatarUrl={selectedAvatar} size="sm" />
+                           </div>
+                           <button
+                             type="button"
+                             onClick={() => fileInputRef.current?.click()}
+                             disabled={isUploading}
+                             className="flex items-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:border-white/40 transition-all disabled:opacity-40"
+                           >
+                             {isUploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
+                             {isUploading ? 'Uploading...' : 'Upload Photo'}
+                           </button>
+                           <input
+                             ref={fileInputRef}
+                             type="file"
+                             accept="image/*"
+                             className="hidden"
+                             onChange={handleImageUpload}
+                           />
+                         </div>
+
+                         {/* Preset grid */}
+                         <div className="flex-1 space-y-3">
+                           <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20">Or choose a preset</p>
+                           <div className="grid grid-cols-6 gap-3">
+                             {AVATAR_PRESETS.map((preset) => (
+                               <button
+                                 key={preset.id}
+                                 type="button"
+                                 onClick={() => setSelectedAvatar(preset.id)}
+                                 title={preset.label}
+                                 className={`w-full aspect-square rounded-xl border-2 transition-all duration-150 flex items-center justify-center bg-gradient-to-br ${preset.bg} active:scale-90 active:brightness-75 ${
+                                   selectedAvatar === preset.id
+                                     ? 'border-white ring-2 ring-white ring-offset-2 ring-offset-[#121214] scale-110 shadow-[0_0_18px_rgba(255,255,255,0.35)]'
+                                     : 'border-white/15 hover:border-white/50 hover:scale-105'
+                                 }`}
+                               >
+                                 <span className="text-lg font-display font-bold text-white select-none">{preset.kanji}</span>
+                               </button>
+                             ))}
+                           </div>
+                         </div>
+                       </div>
                      </div>
 
                      {/* Display Name */}
@@ -220,102 +255,7 @@ export function Settings() {
                 </motion.div>
               )}
 
-              {/* RITUALS TAB */}
-              {activeSection === 'rituals' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-12 w-full flex flex-col items-start text-left">
-                  <div className="space-y-4 flex flex-col items-start font-sans">
-                      <h3 className="text-4xl font-display font-bold text-white tracking-tight uppercase">Daily Rituals</h3>
-                      <p className="text-white/60 text-base font-medium leading-relaxed italic font-display opacity-80 uppercase tracking-wider">Configure daily targets and notifications to maintain your study streak.</p>
-                  </div>
 
-                  <div className="w-full space-y-10">
-                     {/* Daily Study Goal */}
-                     <div className="space-y-6 flex flex-col items-start font-sans">
-                        <label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 ml-1">Daily Study Target</label>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full">
-                          {[10, 15, 20, 30, 45, 60].map((mins) => (
-                            <button
-                              key={mins}
-                              onClick={() => handleGoalUpdate(mins)}
-                              className={`p-5 rounded-2xl text-center transition-all border font-sans ${dailyGoal === mins ? 'bg-white text-black border-white shadow-xl font-bold' : 'bg-white/5 text-white/60 border-white/5 hover:text-white hover:bg-white/10'}`}
-                            >
-                              <span className="block text-2xl font-display font-bold leading-none mb-1">{mins}</span>
-                              <span className="text-[9px] font-black uppercase tracking-wider opacity-60">minutes</span>
-                            </button>
-                          ))}
-                        </div>
-                     </div>
-
-                     <div className="h-px w-full bg-white/10" />
-
-                     {/* Notification Toggles */}
-                     <div className="flex items-center justify-between p-8 rounded-3xl bg-white/5 border border-white/5 w-full">
-                        <div className="space-y-2 flex flex-col items-start font-sans">
-                           <h4 className="text-lg font-bold text-white uppercase tracking-wider">Sanctuary Notifications</h4>
-                           <p className="text-xs text-white/40 normal-case">Enable push notifications and emails to remind you before your streak expires.</p>
-                        </div>
-                        <button
-                          onClick={() => setNotificationsEnabled(!notificationsEnabled)}
-                          className={`w-16 h-8 rounded-full p-1 transition-all ${notificationsEnabled ? 'bg-white' : 'bg-white/10'}`}
-                        >
-                          <div className={`w-6 h-6 rounded-full transition-all ${notificationsEnabled ? 'bg-black translate-x-8' : 'bg-white/30 translate-x-0'}`} />
-                        </button>
-                     </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* AUDIO TAB */}
-              {activeSection === 'audio' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-12 w-full flex flex-col items-start text-left">
-                  <div className="space-y-4 flex flex-col items-start font-sans">
-                      <h3 className="text-4xl font-display font-bold text-white tracking-tight uppercase">Auditory Rituals</h3>
-                      <p className="text-white/60 text-base font-medium leading-relaxed italic font-display opacity-80 uppercase tracking-wider">Modify the auditory feedbacks and audio pronunciation rendering style.</p>
-                  </div>
-
-                  <div className="w-full space-y-10">
-                     <div className="space-y-6 flex flex-col items-start font-sans">
-                        <label className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 ml-1">Soundscapes & Feedback</label>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
-                          {[
-                            { id: 'None', label: 'Silent Mode', icon: VolumeX, desc: 'All sound effects and background ambient ticks disabled.' },
-                            { id: 'Balanced', label: 'Balanced Feedback', icon: Volume1, desc: 'Soft feedback sounds on correct quiz answers and alerts.' },
-                            { id: 'High', label: 'Rich Resonance', icon: Volume2, desc: 'Immersive sound cues and full audio definitions playback.' }
-                          ].map((pref) => (
-                            <button
-                              key={pref.id}
-                              onClick={() => setAudioPreference(pref.id)}
-                              className={`p-8 rounded-[32px] text-left transition-all border flex flex-col justify-between min-h-[200px] font-sans ${audioPreference === pref.id ? 'bg-white text-black border-white shadow-xl' : 'bg-white/5 text-white/40 border-white/5 hover:text-white hover:bg-white/10'}`}
-                            >
-                              <pref.icon size={28} className={audioPreference === pref.id ? 'text-black' : 'text-white/40'} />
-                              <div className="space-y-2 mt-6">
-                                <h4 className="text-base font-bold uppercase tracking-wider">{pref.label}</h4>
-                                <p className={`text-xs normal-case leading-relaxed ${audioPreference === pref.id ? 'text-black/60' : 'text-white/30'}`}>{pref.desc}</p>
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-                     </div>
-                  </div>
-                </motion.div>
-              )}
-
-              <div className="mt-auto pt-10 flex items-center justify-end border-t border-white/10 w-full font-sans text-white">
-                 <button 
-                   onClick={handleSync}
-                   disabled={isSyncing}
-                   className="bg-white text-black px-12 py-4 shadow-2xl uppercase font-black text-[11px] tracking-[0.4em] rounded-full hover:bg-white/90 transition-all flex items-center gap-3 disabled:opacity-50 active:scale-95"
-                 >
-                    {isSyncing ? (
-                      <>Syncing...</>
-                    ) : (
-                      <>
-                       <Check size={14} strokeWidth={4} />
-                       Synchronize All
-                      </>
-                    )}
-                 </button>
-              </div>
             </GlassCard>
          </main>
       </div>

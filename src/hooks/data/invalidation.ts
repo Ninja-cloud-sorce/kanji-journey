@@ -21,6 +21,7 @@ export function invalidateLessonCompletion(qc: QueryClient, userId: string, leve
   qc.invalidateQueries({ queryKey: queryKeys.quizHistory(userId) });
   qc.invalidateQueries({ queryKey: queryKeys.weakTopics(userId) });
   qc.invalidateQueries({ queryKey: queryKeys.flashcardsDue(userId) });
+  qc.invalidateQueries({ queryKey: queryKeys.collections(userId) });
 }
 
 /** Called after a flashcard review */

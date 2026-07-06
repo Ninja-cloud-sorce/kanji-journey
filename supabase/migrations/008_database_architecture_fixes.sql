@@ -3,7 +3,9 @@
 -- =============================================================================
 
 -- 1. Fix public.lessons Compatibility View: Declare 'id' as UUID matching 'lc.id' (not ::text)
-CREATE OR REPLACE VIEW public.lessons AS
+-- DROP first because CREATE OR REPLACE cannot change column types
+DROP VIEW IF EXISTS public.lessons;
+CREATE VIEW public.lessons AS
 SELECT
   lc.id AS id,
   CASE

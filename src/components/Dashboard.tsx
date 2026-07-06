@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Search, 
@@ -18,14 +18,12 @@ import { useNavigate } from 'react-router-dom';
 export function Dashboard() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
-  const { data: collections, isLoading } = useCollections(user?.id);
+  const { data: collections, isFetching } = useCollections(user?.id);
   const [searchQuery, setSearchQuery] = React.useState('');
   const [showResults, setShowResults] = React.useState(false);
 
-  if (!user || !profile) return null;
-
-  // Universal Destination Index
-  const searchDestinations = [
+  // Universal Destination Index — must be before any early return (Rules of Hooks)
+  const searchDestinations = useMemo(() => [
     { name: 'Profile / Status', query: 'profile', action: () => navigate('/profile'), icon: '👤' },
     { name: 'Progress / Analytics', query: 'progress analytics accuracy stats', action: () => navigate('/progress'), icon: '📊' },
     { name: 'Library / Curriculum', query: 'library curriculum packs archive', action: () => navigate('/library'), icon: '📚' },
@@ -35,21 +33,22 @@ export function Dashboard() {
     { name: 'Vocabulary Quiz', query: 'vocab words quiz dictionary', action: () => navigate('/session/vocab'), icon: '🗣️' },
     { name: 'Grammar Ritual', query: 'grammar particles verbs sentence', action: () => navigate('/session/grammar'), icon: '⛩️' },
     { name: 'Reading Practice', query: 'reading stories text narrative', action: () => navigate('/session/reading'), icon: '📖' },
-    // Dynamically added collections
     ...(collections?.map(c => ({
       name: c.title,
       query: `${c.title.toLowerCase()} ${c.subtitle?.toLowerCase() || ''} pack level`,
       action: () => navigate('/library/' + c.id),
       icon: c.icon || '学'
     })) || [])
-  ];
+  ], [collections, navigate]);
 
-  const filteredResults = searchQuery.length > 0 
-    ? searchDestinations.filter(d => 
-        d.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        d.query.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : [];
+  const filteredResults = useMemo(() =>
+    searchQuery.length > 0
+      ? searchDestinations.filter(d =>
+          d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          d.query.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      : [],
+  [searchQuery, searchDestinations]);
 
   const handleSearchCommit = (dest: any) => {
     dest.action();
@@ -57,8 +56,9 @@ export function Dashboard() {
     setShowResults(false);
   };
 
-  // Find the first non-completed collection to show as "Active Curriculum"
   const activeCollection = collections?.find(c => (c.progressPercentage || 0) < 100) || collections?.[0];
+
+  if (!user || !profile) return <div className="flex items-center justify-center min-h-[60vh]"><div className="w-8 h-8 border-2 border-white/10 border-t-white rounded-full animate-spin" /></div>;
 
   return (
     <div className="flex flex-col gap-12 animate-fade-in w-full max-w-[1880px] mx-auto pb-16 font-sans">
@@ -138,12 +138,7 @@ export function Dashboard() {
             <h2 className="text-xl font-black text-white/50 uppercase tracking-[0.2em]">
               Active Curriculum
             </h2>
-            {isLoading ? (
-               <GlassCard className="p-12 w-full min-h-[420px] flex items-center justify-center gap-6">
-                 <Loader2 className="w-8 h-8 text-white/20 animate-spin" />
-                 <p className="text-sm font-black text-white/20 uppercase tracking-[0.3em] animate-pulse">Syncing Progress</p>
-               </GlassCard>
-            ) : activeCollection ? (
+            {activeCollection ? (
               <GlassCard className="p-14 xl:p-16 relative overflow-hidden group w-full min-h-[420px] xl:min-h-[460px] flex flex-col items-start justify-between">
                 <div className="flex justify-between items-start relative z-10 w-full mb-12 gap-10">
                   <div className="space-y-4 flex flex-col items-start">
@@ -157,7 +152,10 @@ export function Dashboard() {
                   
                   <div className="text-right space-y-4 w-[320px] pt-2">
                     <div className="flex justify-between text-sm font-black tracking-widest text-white/40 uppercase">
-                      <span>Overall Mastery</span>
+                      <span className="flex items-center gap-2">
+                        Overall Mastery
+                        {isFetching && <Loader2 size={10} className="animate-spin opacity-40" />}
+                      </span>
                       <span>{activeCollection.progressPercentage || 0}%</span>
                     </div>
                     <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">

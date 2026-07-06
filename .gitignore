@@ -25,6 +25,8 @@ dist-ssr
 
 # Environment Variables
 .env
+.env.*
+!.env.example
 
 # Local MCP credentials
 mcp_config.json

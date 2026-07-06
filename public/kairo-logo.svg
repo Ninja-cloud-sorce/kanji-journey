@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0D0D1A"/>
+      <stop offset="100%" stop-color="#0A0A14"/>
+    </linearGradient>
+    <linearGradient id="ringGrad" x1="60" y1="40" x2="140" y2="160" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#B4C6FC"/>
+      <stop offset="100%" stop-color="#5E6AD2"/>
+    </linearGradient>
+    <linearGradient id="innerGrad" x1="80" y1="80" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#8b8ce6"/>
+      <stop offset="100%" stop-color="#5E6AD2"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softglow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background: rounded square -->
+  <rect width="200" height="200" rx="36" fill="url(#bgGrad)"/>
+
+  <!-- Subtle inner glow on background -->
+  <rect width="200" height="200" rx="36" fill="none" stroke="#5E6AD2" stroke-width="0.5" opacity="0.3"/>
+
+  <!-- Outer ring — open arc (270°), gap at bottom-right suggesting a path not yet complete -->
+  <circle cx="100" cy="100" r="62"
+    stroke="url(#ringGrad)"
+    stroke-width="5"
+    stroke-linecap="round"
+    stroke-dasharray="340 50"
+    stroke-dashoffset="-25"
+    filter="url(#glow)"
+  />
+
+  <!-- Inner ring — the 回 inner square, rounded -->
+  <rect x="68" y="68" width="64" height="64" rx="12"
+    stroke="url(#innerGrad)"
+    stroke-width="4"
+    fill="none"
+    filter="url(#glow)"
+  />
+
+  <!-- Vertical stroke through center — the "K" axis / calligraphy stroke -->
+  <line x1="100" y1="76" x2="100" y2="124"
+    stroke="#B4C6FC"
+    stroke-width="3"
+    stroke-linecap="round"
+    opacity="0.9"
+  />
+
+  <!-- Diagonal upper arm of K -->
+  <line x1="100" y1="100" x2="114" y2="76"
+    stroke="#B4C6FC"
+    stroke-width="3"
+    stroke-linecap="round"
+    opacity="0.9"
+  />
+
+  <!-- Diagonal lower arm of K -->
+  <line x1="100" y1="100" x2="114" y2="124"
+    stroke="#B4C6FC"
+    stroke-width="3"
+    stroke-linecap="round"
+    opacity="0.9"
+  />
+
+  <!-- Center node — the connection point -->
+  <circle cx="100" cy="100" r="5"
+    fill="#B4C6FC"
+    filter="url(#softglow)"
+  />
+
+  <!-- Arc gap accent dot — where the path opens -->
+  <circle cx="145" cy="140" r="4"
+    fill="#5E6AD2"
+    opacity="0.8"
+  />
+</svg>

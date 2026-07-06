@@ -42,7 +42,16 @@ export function LessonDetail({ lessonId, onBack }: { lessonId: string | null, on
     );
   }
 
-  if (!collection) return null;
+  if (!collection) {
+    return (
+      <div className="flex flex-col items-center justify-center h-96 gap-6">
+        <p className="text-[11px] font-black text-white/30 uppercase tracking-[0.4em]">Collection not found</p>
+        <button onClick={onBack} className="text-[10px] font-black text-white/40 hover:text-white uppercase tracking-widest transition-colors">
+          ← Return to Library
+        </button>
+      </div>
+    );
+  }
 
   const filteredLessons = lessons?.filter(l => 
     l.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -164,7 +173,7 @@ export function LessonDetail({ lessonId, onBack }: { lessonId: string | null, on
 
         <div className="flex items-center justify-between pb-10 w-full mt-4 font-sans text-white">
           <div className="flex gap-20">
-            <div className="space-y-3 flex flex-col items-start text-left font-sans font-sans uppercase">
+            <div className="space-y-3 flex flex-col items-start text-left font-sans uppercase">
                <p className="text-[10px] font-black text-white/40 tracking-widest uppercase">Total Progress</p>
                <p className="text-2xl font-display font-bold text-white uppercase tracking-tight">{lessons?.filter(l => l.status === 'COMPLETED').length || 0} / {lessons?.length || 0} Lessons</p>
             </div>

@@ -13,17 +13,15 @@ interface Progress {
 }
 
 interface AppState {
-  // Navigation
+  // Navigation (ephemeral UI state only — source of truth for these is Supabase profiles)
   activeTab: string;
   selectedLessonId: string | null;
   sessionType: SessionType | null;
-  
-  // Data (persistent)
+
+  // Local progress mirror (used to filter session content by collection)
   progress: Progress;
   completedLessons: string[];
-  xp: number;
-  streak: number;
-  
+
   // Actions
   setTab: (tab: string) => void;
   startLesson: (lessonId: string) => void;
@@ -31,7 +29,6 @@ interface AppState {
   exitSession: () => void;
   updateProgress: (module: keyof Progress, value: number) => void;
   completeLesson: (lessonId: string) => void;
-  incrementXP: (amount: number) => void;
 }
 
 export const useStore = create<AppState>()(
@@ -50,13 +47,11 @@ export const useStore = create<AppState>()(
         f2: 0
       },
       completedLessons: [],
-      xp: 0,
-      streak: 0,
 
-      setTab: (tab) => set({ 
-        activeTab: tab, 
-        selectedLessonId: tab === 'lessonDetail' ? undefined : null, 
-        sessionType: null 
+      setTab: (tab) => set({
+        activeTab: tab,
+        selectedLessonId: tab === 'lessonDetail' ? undefined : null,
+        sessionType: null
       }),
       
       startLesson: (lessonId) => set({ 
@@ -85,16 +80,12 @@ export const useStore = create<AppState>()(
         if (state.completedLessons.includes(lessonId)) return {};
         return { completedLessons: [...state.completedLessons, lessonId] };
       }),
-
-      incrementXP: (amount) => set((state) => ({ xp: state.xp + amount })),
     }),
     {
       name: 'scholarly-journey-storage',
       partialize: (state) => ({
         progress: state.progress,
         completedLessons: state.completedLessons,
-        xp: state.xp,
-        streak: state.streak,
       }),
     }
   )

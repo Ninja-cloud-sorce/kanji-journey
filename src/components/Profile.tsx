@@ -1,8 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Loader2
-} from "lucide-react";
+import { Loader2, LogOut } from "lucide-react";
+import { AvatarDisplay } from './Settings';
 import { GlassCard } from './ui/GlassCard';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuizHistory } from '@/hooks/data/useQuizHistory';
@@ -10,14 +9,14 @@ import { useWeakTopics } from '@/hooks/data/useWeakTopics';
 import { useFlashcards } from '@/hooks/data/useFlashcards';
 
 export function Profile() {
-  const { user, profile } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const { data: history } = useQuizHistory(user?.id);
   const { data: weakTopics } = useWeakTopics(user?.id);
   const { data: flashcards } = useFlashcards(user?.id);
   
-  if (!user || !profile) return null;
+  if (!user || !profile) return <div className="flex items-center justify-center min-h-[60vh]"><div className="w-8 h-8 border-2 border-white/10 border-t-white rounded-full animate-spin" /></div>;
 
-  const averageAccuracy = history && history.length > 0 
+  const averageAccuracy = history && history.length > 0
     ? Math.round(history.reduce((acc, curr) => acc + (curr.score || 0), 0) / history.length)
     : 0;
 
@@ -62,13 +61,9 @@ export function Profile() {
         <div className="col-span-4 space-y-12 flex flex-col items-start text-left">
           {/* Avatar & Branding */}
           <div className="space-y-8 flex flex-col items-start">
-            <div className="relative w-56 h-56 group">
+            <div className="relative w-56 h-56">
               <div className="absolute inset-0 rounded-[32px] bg-white/5 border border-white/10 overflow-hidden shadow-2xl flex items-center justify-center">
-                 <img 
-                   src={profile.avatar_url || '/placeholder.svg'} 
-                   alt={profile.display_name || 'User'} 
-                   className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700 hover:brightness-110"
-                 />
+                <AvatarDisplay avatarUrl={profile.avatar_url} size="lg" />
               </div>
               <div className="absolute -bottom-4 -right-4 px-6 py-2 bg-white rounded-xl text-[10px] font-black tracking-widest shadow-xl text-black border border-white uppercase">
                 {(profile.xp || 0) >= 1000 ? 'Master' : 'Student'}
@@ -85,6 +80,14 @@ export function Profile() {
                  {profile.bio || 'No bio set.'}
                </p>
             </div>
+
+            <button
+              onClick={() => signOut()}
+              className="flex items-center justify-center gap-3 w-full py-5 rounded-2xl bg-red-600/30 hover:bg-red-600/50 border border-red-500/30 active:scale-[0.98] transition-all text-red-400 text-[11px] font-black uppercase tracking-[0.3em] font-sans shadow-[0_4px_20px_-8px_rgba(239,68,68,0.3)]"
+            >
+              <LogOut size={16} strokeWidth={2.5} />
+              Terminate Session
+            </button>
           </div>
         </div>
 

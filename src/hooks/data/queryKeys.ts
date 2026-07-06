@@ -1,47 +1,43 @@
 /**
  * queryKeys — stable, typed query key factory for all React Query hooks.
- * All cache invalidations must reference these keys.
+ * All cache keys and invalidations must reference this factory — never use ad-hoc arrays.
  */
 export const queryKeys = {
-  // Profile
-  profile: (userId: string) => ['profile', userId] as const,
+  // ── Auth / User ──────────────────────────────────────────────────
+  profile:    (userId: string) => ['profile', userId] as const,
 
-  // Weak topics (ordered by mistakes_count desc)
-  weakTopics: (userId: string) => ['weakTopics', userId] as const,
+  // ── Curriculum ───────────────────────────────────────────────────
+  collections:      (userId: string)                        => ['collections', userId] as const,
+  lessons:          (collectionId: string, userId: string)  => ['lessons', collectionId, userId] as const,
+  collectionDetail: (collectionId: string)                  => ['collection-detail', collectionId] as const,
+  lessonCatalog:    (level: string)                         => ['lessonCatalog', level] as const,
+  lessonProgress:   (userId: string, level: string)         => ['lessonProgress', userId, level] as const,
+  nextLesson:       (userId: string, level: string)         => ['nextLesson', userId, level] as const,
 
-  // Flashcards due today
+  // ── Practice / Exam ──────────────────────────────────────────────
+  practiceQuestions: (level: string, topic: string, count: number) =>
+    ['practice-questions', level, topic, count] as const,
+  examQuestions:  (level: string, section: string) => ['examQuestions', level, section] as const,
+  generatedExam:  (level: string)                  => ['generatedExam', level] as const,
+
+  // ── Sessions (local-JSON content) ────────────────────────────────
+  readingPassages:  (collectionId?: string | null) => ['reading-passages', collectionId ?? null] as const,
+  grammarExercises: (collectionId?: string | null) => ['grammar-exercises', collectionId ?? null] as const,
+  vocabQuiz:        (collectionId?: string | null) => ['vocab-quiz', collectionId ?? null] as const,
+  words:            (level: string, limit: number, offset: number) =>
+    ['words', level, limit, offset] as const,
+  wordLookup: (word: string) => ['word-lookup', word] as const,
+
+  // ── SRS Flashcards ───────────────────────────────────────────────
   flashcardsDue: (userId: string, collectionId?: string | null) =>
     ['flashcardsDue', userId, collectionId ?? 'all'] as const,
-
-  // All flashcards
   flashcards: (userId: string) => ['flashcards', userId] as const,
 
-  // Next incomplete lesson for a given level
-  nextLesson: (userId: string, level: string) => ['nextLesson', userId, level] as const,
+  // ── Progress & Analytics ─────────────────────────────────────────
+  quizHistory:  (userId: string) => ['quizHistory', userId] as const,
+  weakTopics:   (userId: string) => ['weakTopics', userId] as const,
 
-  // Lesson catalog for a level
-  lessonCatalog: (level: string) => ['lessonCatalog', level] as const,
-
-  // All lesson progress for a user + level
-  lessonProgress: (userId: string, level: string) => ['lessonProgress', userId, level] as const,
-
-  // Quiz history (recent attempts)
-  quizHistory: (userId: string) => ['quizHistory', userId] as const,
-
-  // Learning path (onboarding answers)
-  learningPath: (userId: string) => ['learningPath', userId] as const,
-
-  // Level override
+  // ── Onboarding / Level ───────────────────────────────────────────
+  learningPath:  (userId: string) => ['learningPath', userId] as const,
   levelOverride: (userId: string) => ['levelOverride', userId] as const,
-
-  // Practice questions
-  practiceQuestions: (level: string, topic: string, count: number) =>
-    ['practiceQuestions', level, topic, count] as const,
-
-  // Exam simulator section questions
-  examQuestions: (level: string, section: string) =>
-    ['examQuestions', level, section] as const,
-
-  // Full generated exam payload
-  generatedExam: (level: string) => ['generatedExam', level] as const,
 } as const;

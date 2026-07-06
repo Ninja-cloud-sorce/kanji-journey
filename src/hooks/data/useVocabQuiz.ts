@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import vocabData from '@/data/japanese/vocab.json';
+import { queryKeys } from './queryKeys';
 
 export interface VocabQuestion {
   id: string;
@@ -14,7 +15,7 @@ export interface VocabQuestion {
 
 export function useVocabQuiz(collectionId?: string | null) {
   return useQuery({
-    queryKey: ['vocab-quiz', collectionId],
+    queryKey: queryKeys.vocabQuiz(collectionId),
     staleTime: 60 * 1000,
     refetchOnWindowFocus: false,
     queryFn: async () => {

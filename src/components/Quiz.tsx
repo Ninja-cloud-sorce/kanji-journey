@@ -28,6 +28,13 @@ export function Quiz({ onNavigate, onBack, togglePulse, level = "N5" }: Props) {
     }
   }, [finished, togglePulse]);
 
+  // Clear isWrong flag after 500ms with proper cleanup
+  useEffect(() => {
+    if (!isWrong) return;
+    const t = setTimeout(() => setIsWrong(false), 500);
+    return () => clearTimeout(t);
+  }, [isWrong]);
+
   const q      = questions[idx];
   const isLast = idx === questions.length - 1;
   const pct    = Math.round( ((idx + (revealed ? 1 : 0)) / questions.length) * 100 );
@@ -41,7 +48,6 @@ export function Quiz({ onNavigate, onBack, togglePulse, level = "N5" }: Props) {
       setScore(s => s + 1);
     } else {
       setIsWrong(true);
-      setTimeout(() => setIsWrong(false), 500);
     }
   };
 
